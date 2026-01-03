@@ -310,10 +310,8 @@ private:
 	std::unordered_map<std::string_view, ImFont*> fonts;
 	std::unordered_map<std::string_view, std::unique_ptr<CustomTexture>> textures;
 	HMODULE dllHandle = 0;
-	std::string_view targetWindowTitle;
 	std::string_view targetWindowClassName;
 	std::string_view targetWindowTitleName;
-	POINT lastCursorPoint{};
 
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
