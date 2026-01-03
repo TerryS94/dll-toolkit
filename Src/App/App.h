@@ -313,6 +313,7 @@ private:
 	std::string_view targetWindowClassName;
 	std::string_view targetWindowTitleName;
 	bool hasMouseCursor = false;
+	bool wantFreeCursor = false;
 
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
@@ -427,7 +428,7 @@ public:
 	//make this the first thing you call when you flag your dll to begin ejecting so certain sections unload properly
 	inline void Start_Eject() { this->Set_RendererActive(false); isEjectingDLL = true; }
 	//toggle your main tool overlay on/off
-	inline void ToggleMenu(bool open) { isMenuOpen = open; }
+	inline void ToggleMenu(bool open) { isMenuOpen = open; if (!isMenuOpen) wantFreeCursor = false; }
 	//is our tool overlay open/visible?
 	NODISCARD inline bool IsMenuOpen() const { return isMenuOpen; }
 	//make App aware of the target window titlename and classname you're workin with
@@ -449,6 +450,10 @@ public:
 	void RegisterBackEndHooks();
 	//do we have a cursor given to us by ImGui?
 	NODISCARD bool HasMouseCursor() const { return hasMouseCursor; }
+	//if you need a mouse cursor without having to open the main menu (for just wanting to move HUD around for example)
+	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
+	//do we currently have a free cursor? (a cursor given to us without the need of the main menu being open)
+	inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
 
 	//register a font from memory
 	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
