@@ -470,15 +470,30 @@ void App::UpdateDirectX_VTables()
 		ExitProcess(EXIT_FAILURE);
 	}
 	SwapChainVTable = *reinterpret_cast<void***>(localSwapChain);
+	localSwapChain->Release();
 #elif defined DirectX10 || defined DirectX11
 	SwapChainVTable = *reinterpret_cast<void***>(swapChain);
 #endif
 
 #ifdef DirectX11
-	ContextVTable = *reinterpret_cast<void***>(context);
+	if (context)
+		ContextVTable = *reinterpret_cast<void***>(context);
+	else
+	{
+		ID3D11DeviceContext* localContext = nullptr;
+		reinterpret_cast<ID3D11Device*>(device)->GetImmediateContext(&localContext);
+		if (localContext)
+		{
+			ContextVTable = *reinterpret_cast<void***>(localContext);
+			localContext->Release();
+		}
+		else
+			MessageBox(nullptr, "Couldn't obtain the D3D11 immediate context", "DX Error", MB_OK | MB_ICONERROR);
+	}
 #endif
 }
 #endif
+
 	
 #if defined DirectX9 || defined DirectX10 || defined DirectX11
 void* App::GetDirectXDeviceMethodByIndex(int index)
