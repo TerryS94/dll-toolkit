@@ -127,6 +127,7 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
         app.UpdateDirectXDevice(reinterpret_cast<void*>(device)); 
 #elifdef DirectX11
         app.Update_HWND(GetWindowHandle());
+		app.Set_TargetWindowInfo("game window title", "window class name");
         app.UpdateDirectXDevice(*reinterpret_cast<void**>(0x35AE484)); //example
         app.UpdateDirectXSwapChain(*reinterpret_cast<void**>(0x35E5F94)); //example
         app.UpdateDirectXContext(*reinterpret_cast<void**>(0x35AE488)); //example
@@ -138,6 +139,8 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
         app.RegisterBackEndHooks();
         app.RegisterUniversalHooks();
 
+		//example for registering your own hook. (detour not implemented in this example)
+		app.RegisterHook("OnTakeDamage", 0x123456, OnTakeDamage_Detour);
         //example for writing a single byte x times at a specific address
         app.RegisterPatch(0x123456, { 0x90 }, 5u);//nop 5 bytes starting at 0x123456
         //example for replacing x bytes at a specific address
