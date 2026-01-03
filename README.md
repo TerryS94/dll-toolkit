@@ -3,7 +3,8 @@
 This started out initially as a private project for convenience on future dll tools because it's annoying setting up some of the boiler plate before being able to get to the fun stuff, so recently I decided that it's finally time to solve that problem for myself and maybe even for others too :)
 
 ## Adding to your dll project
-- Put the **DirectX9** and **App** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
+- Add the **DirectX9** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
+- Add the **App** folder into your dll project.
 - Also Pull ImGui into your project. (Leave its folder structure in tact)
 
 ## Notes
