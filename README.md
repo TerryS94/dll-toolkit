@@ -1,4 +1,4 @@
-**This no name framework is still ___very WIP___ but mostly working :)**
+**dll-toolkit is still ___very WIP___ but mostly working :)**
 
 This started out initially as a private project for convenience on future dll tools because it's annoying setting up some of the boiler plate before being able to get to the fun stuff, so recently I decided that it's finally time to solve that problem for myself and maybe even for others too :)
 
