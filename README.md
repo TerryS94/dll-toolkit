@@ -103,10 +103,12 @@ void MainRender()
     if (!app.IsRendererActive())
 		return;
 
+	if (app.IsKeyPressed(AppKeys::KEY_F3))
+    	app.ToggleFreeMouseCursor(!app.IsFreeMouseCursorActive());
     if (app.IsKeyPressed(AppKeys::KEY_F4))
         app.ToggleMenu(!app.IsMenuOpen());
 
-    const bool want_mouse_this_frame = app.IsMenuOpen(); // || other custom logic you may want here
+    const bool want_mouse_this_frame = app.IsMenuOpen() || app.IsFreeMouseCursorActive();// || other custom logic you may want here
     app.BeginFrame(want_mouse_this_frame);
 
     DrawStuff();
