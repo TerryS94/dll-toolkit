@@ -1,9 +1,10 @@
-**This no name framework is still ___very WIP___ but mostly working :)**
+**dll-toolkit is still ___very WIP___ but mostly working :)**
 
 This started out initially as a private project for convenience on future dll tools because it's annoying setting up some of the boiler plate before being able to get to the fun stuff, so recently I decided that it's finally time to solve that problem for myself and maybe even for others too :)
 
 ## Adding to your dll project
-- Put the **DirectX9** and **App** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
+- Add the **DirectX9** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
+- Add the **App** folder into your dll project.
 - Also Pull ImGui into your project. (Leave its folder structure in tact)
 
 ## Notes
@@ -21,7 +22,7 @@ vcpkg install polyhook2:x86-windows-static polyhook2:x64-windows-static
 
 # Example Usage
 ### Here is a simple dllmain.cpp example you can achieve with this framework in it's current state
-- It would be even less code if this example only focused on a single backend :)
+- It would be even less code if this example only focused on a single game example :)
 
 ```cpp
 //the flow of things may evolve with time... but even already
