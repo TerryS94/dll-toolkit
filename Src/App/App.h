@@ -120,16 +120,7 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #include "backends/imgui_impl_win32.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-#if defined OpenGL2
-#pragma comment(lib, "opengl32.lib")
-#include "backends/imgui_impl_opengl2.h"
-#include <GL/gl.h>
-#elif defined OpenGL3
-#pragma comment(lib, "opengl32.lib")
-#include "backends/imgui_impl_opengl3_loader.h"
-#include "backends/imgui_impl_opengl3.h"
-#include <GL/gl.h>
-#elif defined DirectX9
+#if defined DirectX9
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <d3dx9tex.h>
@@ -147,6 +138,18 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #include "backends/imgui_impl_dx12.h"
 #include <d3d12.h>
 #include <dxgi1_5.h>
+#elif defined OpenGL2
+#pragma comment(lib, "opengl32.lib")
+#include "backends/imgui_impl_opengl2.h"
+#include <GL/gl.h>
+#elif defined OpenGL3
+#pragma comment(lib, "opengl32.lib")
+#include "backends/imgui_impl_opengl3_loader.h"
+#include "backends/imgui_impl_opengl3.h"
+#include <GL/gl.h>
+#ifndef GL_RGBA8
+#define GL_RGBA8 0x8058
+#endif
 #endif
 
 #include <Psapi.h>
@@ -289,8 +292,8 @@ public:
 	void InstallHooks();
 	//uninstall all registered hooks
 	void UninstallHooks();
-	//returns a pointer to a location within a specified module using a pattern.
-	NODISCARD BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module);
+	//returns a pointer to a location in memory using a pattern. Leave param 'module' empty to scan the current process by default.
+	NODISCARD BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module = "");
 	//in case you have something in another thread that needs to wait for this task to be done
 	NODISCARD inline bool AreHooksInstalled() const { return hooks_applied; }
 	//in case you have something in another thread that needs to wait for this task to be done

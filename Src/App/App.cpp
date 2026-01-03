@@ -16,13 +16,7 @@
 #include "misc/cpp/imgui_stdlib.cpp"
 #include "backends/imgui_impl_win32.cpp"
 
-#ifdef OpenGL2
-#include "backends/imgui_impl_opengl2.cpp"
-#include "Hooks/OpenGL_Hooks.cpp"
-#elifdef OpenGL3
-#include "backends/imgui_impl_opengl3.cpp"
-#include "Hooks/OpenGL_Hooks.cpp"
-#elifdef DirectX9
+#ifdef DirectX9
 #include "backends/imgui_impl_dx9.cpp"
 #include "Hooks/DX9_Hooks.cpp"
 #elifdef DirectX10
@@ -31,6 +25,12 @@
 #elifdef DirectX11
 #include "backends/imgui_impl_dx11.cpp"
 #include "Hooks/DX11_Hooks.cpp"
+#elifdef OpenGL2
+#include "backends/imgui_impl_opengl2.cpp"
+#include "Hooks/OpenGL_Hooks.cpp"
+#elifdef OpenGL3
+#include "backends/imgui_impl_opengl3.cpp"
+#include "Hooks/OpenGL_Hooks.cpp"
 #endif
 
 App app;
@@ -363,11 +363,7 @@ void App::AddTextureFromFile(const std::string_view& name, const std::string_vie
 	auto tex = std::make_unique<CustomTexture>();
 #ifdef DirectX9
 	tex->ptr = DX9_LoadTextureFromFile(path.data());
-	if (!tex->ptr)
-	{
-		MessageBox(nullptr, std::format("DX9: failed to load texture \"{}\"", path).c_str(), "F", MB_OK);
-		return;
-	}
+	if (!tex->ptr) { MessageBox(nullptr, std::format("DX9: failed to load texture \"{}\"", path).c_str(), "F", MB_OK); return; }
 #elifdef DirectX10
 	tex->ptr = DX10_LoadTextureFromFile(path.data());
 	if (!tex->ptr) { MessageBox(nullptr, std::format("DX10: failed to load texture \"{}\"", path).data(), "F", MB_OK); return; }
@@ -428,7 +424,7 @@ bool App::GL_CreateTextureRGBA8(const unsigned char* rgba, int w, int h, GLTextu
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #ifdef OpenGL3
 	//GL3+ prefers explicit sized internal formats.
-	glTexImage2D(GL_TEXTURE_2D, 0, 0x8058, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);//GL_RGBA8 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba); 
 #else
 	//GL2 typically uses GL_RGBA as internal format.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
@@ -1032,7 +1028,7 @@ static std::vector<int> ParsePattern(const std::string_view& pattern)
 }
 BYTE* HookingLayer::FindPattern(const std::string_view& pattern, const std::string_view& module)
 {
-	HMODULE modHandle = GetModuleHandleA(module.data());
+	HMODULE modHandle = module.empty() ? GetModuleHandleA(nullptr) : GetModuleHandleA(module.data());
 	if (!modHandle) return nullptr;
 	MODULEINFO moduleInfo {};
 	if (!GetModuleInformation(GetCurrentProcess(), modHandle, &moduleInfo, sizeof(moduleInfo))) return nullptr;
