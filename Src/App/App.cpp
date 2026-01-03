@@ -423,7 +423,7 @@ bool App::GL_CreateTextureRGBA8(const unsigned char* rgba, int w, int h, GLTextu
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #ifdef OpenGL3
 	//GL3+ prefers explicit sized internal formats.
-	glTexImage2D(GL_TEXTURE_2D, 0, 0x8058, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);//GL_RGBA8
+	glTexImage2D(GL_TEXTURE_2D, 0, 0x8058, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);//GL_RGBA8 
 #else
 	//GL2 typically uses GL_RGBA as internal format.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
