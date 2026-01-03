@@ -13,7 +13,7 @@ namespace ProvidedDetours
 		
 		if (SUCCEEDED(result) && app.HasInitializedFirstTime())
 		{
-			//InitResources(); call your init resources here
+			app.Call_UserInitResources();
 			app.ImGui_CreateDeviceObjects();
 		}
 		else
@@ -33,6 +33,7 @@ namespace ProvidedDetours
 	}
 	HRESULT __stdcall EndScene_Detour(LPDIRECT3DDEVICE9 pD3D9)
 	{
+		MainRender();
 		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
 		return result;
 	}

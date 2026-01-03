@@ -314,6 +314,7 @@ private:
 	std::string_view targetWindowTitleName;
 	bool hasMouseCursor = false;
 	bool wantFreeCursor = false;
+	std::function<void()> userInitResources;
 
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
@@ -454,6 +455,11 @@ public:
 	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
 	//do we currently have a free cursor? (a cursor given to us without the need of the main menu being open)
 	inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
+	//set your InitResources function pointer here so that way the hooking side of things is handled automatically.
+	inline void Set_InitResourcesFunc(std::function<void()> initResources) { userInitResources = std::move(initResources); };
+	//For hooks etc to call automatically. You can ignore this.
+	//Will call the user's InitResources function which App is made aware of by the user defining it on inject with the Set_InitResourcesFunc function
+	inline void Call_UserInitResources() { if (userInitResources) userInitResources(); };
 
 	//register a font from memory
 	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
