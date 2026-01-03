@@ -46,7 +46,7 @@ namespace ProvidedDetours
 			}
 		}
 		if (menuOpen && uMsg == WM_INPUT)
-			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+			return 0;
 
 		//add stuff here
 
@@ -103,5 +103,10 @@ namespace ProvidedDetours
 	{
 		BOOL success = app.GetOriginalFunction<tDeviceIoControl>("DeviceIoControl")(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, lpOverlapped);
 		return success;
+	}
+	BOOL WINAPI ScreenToClient_Detour(HWND hWnd, LPPOINT lpPoint)
+	{
+		BOOL result = app.GetOriginalFunction<tScreenToClient>("ScreenToClient")(hWnd, lpPoint);
+		return result;
 	}
 }

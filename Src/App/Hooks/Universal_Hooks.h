@@ -12,6 +12,7 @@ typedef BOOL(WINAPI* tNtUserSetCursorPos)(int x, int y);
 typedef BOOL(WINAPI* tSetCursorPos)(int x, int y);
 typedef BOOL(WINAPI* tClipCursor)(const RECT* rc);
 typedef BOOL(WINAPI* tDeviceIoControl)(HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped);
+typedef BOOL(WINAPI* tScreenToClient)(HWND hWnd, LPPOINT lpPoint);
 
 namespace ProvidedDetours
 {
@@ -24,4 +25,5 @@ namespace ProvidedDetours
 	BOOL WINAPI NtUserSetCursorPos_Detour(int x, int y);
 	BOOL WINAPI ClipCursor_Detour(const RECT* rc);
 	BOOL WINAPI DeviceIoControl_Detour(HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped);
+	BOOL WINAPI ScreenToClient_Detour(HWND hWnd, LPPOINT lpPoint);
 }

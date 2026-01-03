@@ -227,6 +227,7 @@ void App::RegisterUniversalHooks()
 	RegisterHook("ClipCursor",          (uint64_t)ClipCursor_Addr,          (uint64_t)ProvidedDetours::ClipCursor_Detour);
 	RegisterHook("NtUserSetCursorPos",  (uint64_t)NtUserSetCursorPos_Addr,  (uint64_t)ProvidedDetours::NtUserSetCursorPos_Detour);
 	RegisterHook("DeviceIoControl",     (uint64_t)DeviceIoControl_Addr,     (uint64_t)ProvidedDetours::DeviceIoControl_Detour);
+	RegisterHook("ScreenToClient",      (uint64_t)ScreenToClient_Addr,      (uint64_t)ProvidedDetours::ScreenToClient_Detour);
 }
 
 void App::RegisterBackEndHooks()
