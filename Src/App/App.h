@@ -23,6 +23,41 @@
 #include <memory>
 #include <atomic>
 
+#if defined(_WIN64)     || defined(__amd64__) || defined(__amd64) \
+ || defined(__x86_64__) || defined(_M_X64)     || defined(_M_AMD64) \
+ || defined(__aarch64__) || defined(_M_ARM64)
+#ifndef BUILD_x64
+#define BUILD_x64
+#endif
+#endif
+
+// Detect 32-bit x86 specifically
+#if defined(_M_IX86) || defined(__i386__)
+#ifndef BUILD_x86
+#define BUILD_x86
+#endif
+#endif
+
+#if defined(BUILD_x64) && defined(BUILD_x86)
+#error "Conflicting build defines: both BUILD_x64 and BUILD_x86 are defined"
+#endif
+
+#if defined(BUILD_x64)
+#define POINTER_SIZE 8
+#elif defined(BUILD_x86)
+#define POINTER_SIZE 4
+#elif defined(__SIZEOF_POINTER__)
+#define POINTER_SIZE __SIZEOF_POINTER__
+#else
+#define POINTER_SIZE (sizeof(void*))
+#endif
+
+#if defined(__cplusplus)
+static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
+#else
+_Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
+#endif
+
 #ifndef NODISCARD
 #define NODISCARD [[nodiscard]]
 #endif
@@ -38,7 +73,7 @@
 #error "You must define exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3!"
 #endif
 
-#if defined(DirectX9) && !defined(_WIN32)
+#if defined(DirectX9) && !defined(_X86_)
 #error "If you use DirectX9, you must also build as x86!"
 #endif
 
@@ -117,9 +152,9 @@
 
 #include <Psapi.h>
 
-#ifdef _WIN32
+#ifdef BUILD_x86
 #include "polyhook2/Detour/x86Detour.hpp"
-#elifdef _WIN64
+#elifdef BUILD_x64
 #include "polyhook2/Detour/x64Detour.hpp"
 #endif
 
@@ -211,9 +246,9 @@ struct Patch
 struct Hook
 {
 	uint64_t original;
-#ifdef _WIN32
+#ifdef BUILD_x86
 	PLH::x86Detour* detour;
-#elifdef _WIN64
+#elifdef BUILD_x64
 	PLH::x64Detour* detour;
 #endif
 };
