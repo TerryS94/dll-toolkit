@@ -61,14 +61,15 @@
 #elifdef DirectX12
 //todo
 #elifdef AnyOpenGLActive			   
-#define OpenGL_wglMakeCurrent_Addr     wglMakeCurrent					     
+#define OpenGL_wglMakeCurrent_Addr     app.Get_ProcAddress("opengl32.dll",   "wglMakeCurrent")					     
 #define OpenGL_SwapBuffers_Addr        app.Get_ProcAddress("gdi32.dll",      "SwapBuffers")
 #endif							       									     
 									   									     
-#define GetCursorPos_Addr              ::GetCursorPos					     
-#define SetCursorPos_Addr              ::SetCursorPos					     
-#define ClipCursor_Addr                ::ClipCursor						     
-#define CreateWindowExA_Addr           app.Get_ProcAddress("user32",         "CreateWindowExA")
+#define GetCursorPos_Addr              app.Get_ProcAddress("user32.dll",     "GetCursorPos")
+#define SetCursorPos_Addr              app.Get_ProcAddress("user32.dll",     "SetCursorPos")
+#define ClipCursor_Addr                app.Get_ProcAddress("user32.dll",     "ClipCursor")
+#define ScreenToClient_Addr            app.Get_ProcAddress("user32.dll",     "ScreenToClient")
+#define CreateWindowExA_Addr           app.Get_ProcAddress("user32.dll",     "CreateWindowExA")
 #define NtUserDestroyWindow_Addr       app.Get_ProcAddress("win32u.dll",     "NtUserDestroyWindow")
 #define NtUserSetCursorPos_Addr        app.Get_ProcAddress("win32u.dll",     "NtUserSetCursorPos")
 #define DeviceIoControl_Addr           app.Get_ProcAddress("kernelbase.dll", "DeviceIoControl")
