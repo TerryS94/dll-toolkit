@@ -72,7 +72,7 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #error "You must define exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3!"
 #endif
 
-#if defined(DirectX9) && !defined(_X86_)
+#if defined(DirectX9) && !defined(BUILD_x86)
 #error "If you use DirectX9, you must also build as x86!"
 #endif
 
@@ -214,6 +214,7 @@ struct CustomTexture
 	//can add more fields here that are not dependent on the backend (size for example)
 };
 
+//virtual keycodes but in enum form so its a lot nicer to use and find stuff
 enum class AppKeys : int
 {
 	INVALID = -1, LBUTTON = 0x01, RBUTTON = 0x02, CANCEL = 0x03, MIDDLEMOUSE = 0x04, MOUSE4 = 0x05, MOUSE5 = 0x06, BACK = 0x08, TAB = 0x09, CLEAR = 0x0C, RETURN = 0x0D, SHIFT = 0x10,
@@ -557,4 +558,3 @@ public:
 #endif
 };
 extern App app;
-
