@@ -31,7 +31,6 @@
 #endif
 #endif
 
-// Detect 32-bit x86 specifically
 #if defined(_M_IX86) || defined(__i386__)
 #ifndef BUILD_x86
 #define BUILD_x86

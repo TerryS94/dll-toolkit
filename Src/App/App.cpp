@@ -143,8 +143,11 @@ void App::BeginFrame(bool want_mouse_this_frame)
 
 	lastMouseState = want_mouse_this_frame;
 
-	if (ImGui::GetCurrentContext())
-		ImGui::GetIO().MouseDrawCursor = want_mouse_this_frame;
+	auto& io = ImGui::GetIO();
+	if (ImGui::GetCurrentContext()) io.MouseDrawCursor = want_mouse_this_frame;
+	//if a cursor is not explicitly given to us, completely drop mouse support just in case the user is rendering any HUD then they can't
+	//accidentally click and drag to move stuff around even though they never intended to.
+	if (!want_mouse_this_frame) io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
 
 	Update_IsTargetWindowFocused();
 
