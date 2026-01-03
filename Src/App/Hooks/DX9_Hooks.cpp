@@ -13,7 +13,7 @@ namespace ProvidedDetours
 		
 		if (SUCCEEDED(result) && app.HasInitializedFirstTime())
 		{
-			InitResources();
+			//InitResources(); call your init resources here
 			app.ImGui_CreateDeviceObjects();
 		}
 		else
@@ -28,26 +28,12 @@ namespace ProvidedDetours
 	}
 	HRESULT __stdcall BeginScene_Detour(IDirect3DDevice9* pDevice)
 	{
-		auto original = app.GetOriginalFunction<tDX9_BeginScene>("BeginScene");
-		//Call of Duty 4 specific address. idea behind this is to make sure only the games beginscene ran and not a overlay which can make our-
-		//code in here run 2+ times a frame depending how many overlays the user is using.
-		if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != 0x61537A)
-			return original(pDevice);
-
-		HRESULT result = original(pDevice);
+		HRESULT result = app.GetOriginalFunction<tDX9_BeginScene>("BeginScene")(pDevice);
 		return result;
 	}
 	HRESULT __stdcall EndScene_Detour(LPDIRECT3DDEVICE9 pD3D9)
 	{
-		auto original = app.GetOriginalFunction<tDX9_EndScene>("EndScene");
-		//Call of Duty 4 specific address. idea behind this is to make sure only the games endscene ran and not a overlay which can make our-
-		//code in here run 2+ times a frame depending how many overlays the user is using.
-		if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != 0x615743 && pD3D9)
-			return original(pD3D9);
-
-		MainRender();
-
-		HRESULT result = original(pD3D9);
+		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
 		return result;
 	}
 #pragma optimize("", off)

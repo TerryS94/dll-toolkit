@@ -4,7 +4,6 @@ namespace ProvidedDetours
 {
 	HRESULT __stdcall Present_Detour(_In_ IDXGISwapChain* pSwapChain, _In_ UINT SyncInterval, _In_ UINT Flags)
 	{
-		MainRender(pSwapChain);
 		HRESULT result = app.GetOriginalFunction<tDX11_Present>("Present")(pSwapChain, SyncInterval, Flags);
 		return result;
 	}
