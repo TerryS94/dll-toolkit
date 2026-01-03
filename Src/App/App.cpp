@@ -87,7 +87,7 @@ void App::ReloadRenderer()
 
 void App::Reset_WndProc() const
 {
-#ifdef _M_IX86
+#ifdef _WIN32
 	SetWindowLongPtr(hwnd, GWL_WNDPROC, (LONG_PTR)original_WndProc);
 #elifdef _WIN64
 	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)original_WndProc);
@@ -96,7 +96,7 @@ void App::Reset_WndProc() const
 
 void App::Override_WndProc()
 {
-#ifdef _M_IX86
+#ifdef _WIN32
 	original_WndProc = (WNDPROC)SetWindowLongPtr(this->hwnd, GWL_WNDPROC, (LONG_PTR)ProvidedDetours::WndProc_Detour);
 #elifdef _WIN64
 	original_WndProc = (WNDPROC)SetWindowLongPtr(this->hwnd, GWLP_WNDPROC, (LONG_PTR)ProvidedDetours::WndProc_Detour);
@@ -951,7 +951,7 @@ void HookingLayer::RegisterHook(const std::string_view& name, uint64_t funcToHoo
 		ExitProcess(1);
 	}
 	hooks[name] = Hook();
-#ifdef _M_IX86
+#ifdef _WIN32
 	this->hooks[name].detour = new PLH::x86Detour(funcToHook, detour, &this->hooks[name].original);
 #elifdef _WIN64
 	this->hooks[name].detour = new PLH::x64Detour(funcToHook, detour, &this->hooks[name].original);

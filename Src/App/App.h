@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define OpenGL3
+#define DirectX9
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -38,7 +38,7 @@
 #error "You must define exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3!"
 #endif
 
-#if defined(DirectX9) && !defined(_M_IX86)
+#if defined(DirectX9) && !defined(_WIN32)
 #error "If you use DirectX9, you must also build as x86!"
 #endif
 
@@ -55,7 +55,7 @@
 #define DX9_DrawIndexedPrimitive_Addr  app.GetDirectXDeviceMethodByIndex(82)
 #define DX9_Present_Addr               ((char*)(app.GetDirectXSwapChainMethodByIndex(3)) + 5)
 #elifdef DirectX10
-//todo
+#define DX10_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
 #elifdef DirectX11					   
 #define DX11_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
 #elifdef DirectX12
@@ -116,7 +116,7 @@
 
 #include <Psapi.h>
 
-#ifdef _M_IX86
+#ifdef _WIN32
 #include "polyhook2/Detour/x86Detour.hpp"
 #elifdef _WIN64
 #include "polyhook2/Detour/x64Detour.hpp"
@@ -210,7 +210,7 @@ struct Patch
 struct Hook
 {
 	uint64_t original;
-#ifdef _M_IX86
+#ifdef _WIN32
 	PLH::x86Detour* detour;
 #elifdef _WIN64
 	PLH::x64Detour* detour;
