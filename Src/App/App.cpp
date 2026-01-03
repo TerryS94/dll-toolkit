@@ -134,6 +134,7 @@ void App::Shutdown()
 
 void App::BeginFrame(bool want_mouse_this_frame)
 {
+	this->hasMouseCursor = want_mouse_this_frame;
 	static bool lastMouseState = want_mouse_this_frame;
 	if (!want_mouse_this_frame && lastMouseState)
 		MouseStateSnapshot_OnMenuClosed();

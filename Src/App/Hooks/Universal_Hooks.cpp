@@ -11,7 +11,7 @@ namespace ProvidedDetours
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 		ImGuiContext* ctx = ImGui::GetCurrentContext();
-		const bool menuOpen = (ctx && app.IsMenuOpen());
+		const bool menuOpen = (ctx && app.HasMouseCursor());
 		bool blockMouse = false;
 		bool blockKeyboard = false;
 
@@ -81,21 +81,21 @@ namespace ProvidedDetours
 
 	BOOL WINAPI SetCursorPos_Detour(int x, int y)
 	{
-		if (app.IsMenuOpen() && !app.AllowMouseWarpNow())
+		if (app.HasMouseCursor() && !app.AllowMouseWarpNow())
 			return TRUE;
 		return app.GetOriginalFunction<tSetCursorPos>("SetCursorPos")(x, y);
 	}
 
 	BOOL WINAPI NtUserSetCursorPos_Detour(int x, int y)
 	{
-		if (app.IsMenuOpen() && !app.AllowMouseWarpNow())
+		if (app.HasMouseCursor() && !app.AllowMouseWarpNow())
 			return TRUE;
 		return app.GetOriginalFunction<tNtUserSetCursorPos>("NtUserSetCursorPos")(x, y);
 	}
 
 	BOOL WINAPI ClipCursor_Detour(const RECT* rc)
 	{
-		if (app.IsMenuOpen()) return TRUE;
+		if (app.HasMouseCursor()) return TRUE;
 		return app.GetOriginalFunction<tClipCursor>("ClipCursor")(rc);
 	}
 

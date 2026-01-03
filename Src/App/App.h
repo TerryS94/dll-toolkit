@@ -312,6 +312,7 @@ private:
 	HMODULE dllHandle = 0;
 	std::string_view targetWindowClassName;
 	std::string_view targetWindowTitleName;
+	bool hasMouseCursor = false;
 
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
@@ -446,6 +447,8 @@ public:
 	//or if you're building for OpenGL then itll register SwapBuffers etc for you.
 	//just simply call this function before you invoke InstallHooks()
 	void RegisterBackEndHooks();
+	//do we have a cursor given to us by ImGui?
+	NODISCARD bool HasMouseCursor() const { return hasMouseCursor; }
 
 	//register a font from memory
 	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
