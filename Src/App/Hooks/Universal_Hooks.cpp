@@ -11,15 +11,15 @@ namespace ProvidedDetours
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 		ImGuiContext* ctx = ImGui::GetCurrentContext();
-		const bool menuOpen = (ctx && app.HasMouseCursor());
+		const bool hasMouse = (ctx && app.HasMouseCursor());
 		bool blockMouse = false;
 		bool blockKeyboard = false;
 
 		if (ctx)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			blockMouse = menuOpen ? true : io.WantCaptureMouse;
-			blockKeyboard = menuOpen ? true : io.WantCaptureKeyboard;
+			blockMouse = hasMouse ? true : io.WantCaptureMouse;
+			blockKeyboard = hasMouse ? true : io.WantCaptureKeyboard;
 		}
 		if (blockMouse)
 		{
@@ -45,7 +45,7 @@ namespace ProvidedDetours
 					return 0;
 			}
 		}
-		if (menuOpen && uMsg == WM_INPUT)
+		if (hasMouse && uMsg == WM_INPUT)
 			return 0;
 
 		//add stuff here
