@@ -33,7 +33,6 @@ namespace ProvidedDetours
 	}
 	HRESULT __stdcall EndScene_Detour(LPDIRECT3DDEVICE9 pD3D9)
 	{
-		MainRender();
 		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
 		return result;
 	}
