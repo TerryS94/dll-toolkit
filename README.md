@@ -1,12 +1,13 @@
 Setting up boilerplate on every new project gets old fast, so this toolkit exists to let you skip it and work directly with the game’s own renderer from the start.
 
 ## What You Need First
-This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following runtime pointers for your target game:
+This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following for your target game:
 - DirectX 9: the game’s ```IDirect3DDevice9*```. Everything else is derived from that device.
 - DirectX10/11: the game’s ```IDXGISwapChain*```. Everything else is derived from that swapchain.
 - OpenGL2/3: the GLSL version string (e.g. ```"#version 330 core"```) that ImGui needs at init.
 
 This lets the toolkit run on the game’s real renderer rather than a local dummy, so visuals, device state, and input match the game exactly.
+
 This may sound overkill if you only plan to make the simplest overlay, but if you know basic reverse engineering, providing the required field is usually quick.
 
 ## Project Setup
