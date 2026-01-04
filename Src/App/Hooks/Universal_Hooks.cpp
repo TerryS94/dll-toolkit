@@ -5,8 +5,6 @@
 
 namespace ProvidedDetours
 {
-	//in case you didn't look at the header. Do NOT worry about high-jacking/restoring WndProc cause that's already automated for you.
-	//Simply just add whatever logic you want in here and you're good to go :)
 	LRESULT WINAPI WndProc_Detour(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
@@ -46,7 +44,7 @@ namespace ProvidedDetours
 			}
 		}
 		if (hasMouse && uMsg == WM_INPUT)
-			return 0;
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 
 		//add stuff here
 
@@ -75,21 +73,31 @@ namespace ProvidedDetours
 
 	BOOL WINAPI GetCursorPos_Detour(LPPOINT point)
 	{
-		const BOOL result = app.GetOriginalFunction<tGetCursorPos>("GetCursorPos")(point);
-		return result;
+		static POINT lastCursorPos{};
+		if (app.HasMouseCursor())
+		{
+			POINT lastPos = lastCursorPos;
+			point->x = lastPos.x;
+			point->y = lastPos.y;
+			return true;
+		}
+		else
+		{
+			BOOL result = app.GetOriginalFunction<tGetCursorPos>("GetCursorPos")(point);
+			lastCursorPos = *point;
+			return result;
+		}
 	}
 
 	BOOL WINAPI SetCursorPos_Detour(int x, int y)
 	{
-		if (app.HasMouseCursor() && !app.AllowMouseWarpNow())
-			return TRUE;
+		if (app.HasMouseCursor() && !app.AllowMouseWarpNow()) return TRUE;
 		return app.GetOriginalFunction<tSetCursorPos>("SetCursorPos")(x, y);
 	}
 
 	BOOL WINAPI NtUserSetCursorPos_Detour(int x, int y)
 	{
-		if (app.HasMouseCursor() && !app.AllowMouseWarpNow())
-			return TRUE;
+		if (app.HasMouseCursor() && !app.AllowMouseWarpNow()) return TRUE;
 		return app.GetOriginalFunction<tNtUserSetCursorPos>("NtUserSetCursorPos")(x, y);
 	}
 
