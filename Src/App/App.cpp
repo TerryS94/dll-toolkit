@@ -225,14 +225,14 @@ void App::FreeResources()
 
 void App::RegisterUniversalHooks()
 {
-	RegisterHook("CreateWindowExA",     (uint64_t)CreateWindowExA_Addr,     (uint64_t)ProvidedDetours::CreateWindowExA_Detour);
-	RegisterHook("NtUserDestroyWindow", (uint64_t)NtUserDestroyWindow_Addr, (uint64_t)ProvidedDetours::NtUserDestroyWindow_Detour);
-	RegisterHook("GetCursorPos",        (uint64_t)GetCursorPos_Addr,        (uint64_t)ProvidedDetours::GetCursorPos_Detour);
-	RegisterHook("SetCursorPos",        (uint64_t)SetCursorPos_Addr,        (uint64_t)ProvidedDetours::SetCursorPos_Detour);
-	RegisterHook("ClipCursor",          (uint64_t)ClipCursor_Addr,          (uint64_t)ProvidedDetours::ClipCursor_Detour);
-	RegisterHook("NtUserSetCursorPos",  (uint64_t)NtUserSetCursorPos_Addr,  (uint64_t)ProvidedDetours::NtUserSetCursorPos_Detour);
-	RegisterHook("DeviceIoControl",     (uint64_t)DeviceIoControl_Addr,     (uint64_t)ProvidedDetours::DeviceIoControl_Detour);
-	RegisterHook("ScreenToClient",      (uint64_t)ScreenToClient_Addr,      (uint64_t)ProvidedDetours::ScreenToClient_Detour);
+	RegisterHook("CreateWindowExA",          (uint64_t)CreateWindowExA_Addr,           (uint64_t)ProvidedDetours::CreateWindowExA_Detour);
+	RegisterHook("NtUserDestroyWindow",      (uint64_t)NtUserDestroyWindow_Addr,       (uint64_t)ProvidedDetours::NtUserDestroyWindow_Detour);
+	RegisterHook("GetCursorPos",             (uint64_t)GetCursorPos_Addr,              (uint64_t)ProvidedDetours::GetCursorPos_Detour);
+	RegisterHook("SetCursorPos",             (uint64_t)SetCursorPos_Addr,              (uint64_t)ProvidedDetours::SetCursorPos_Detour);
+	RegisterHook("ClipCursor",               (uint64_t)ClipCursor_Addr,                (uint64_t)ProvidedDetours::ClipCursor_Detour);
+	RegisterHook("NtUserSetCursorPos",       (uint64_t)NtUserSetCursorPos_Addr,        (uint64_t)ProvidedDetours::NtUserSetCursorPos_Detour);
+	RegisterHook("DeviceIoControl",          (uint64_t)DeviceIoControl_Addr,           (uint64_t)ProvidedDetours::DeviceIoControl_Detour);
+	RegisterHook("ScreenToClient",           (uint64_t)ScreenToClient_Addr,            (uint64_t)ProvidedDetours::ScreenToClient_Detour);
 }
 
 void App::RegisterBackEndHooks()
@@ -243,7 +243,7 @@ void App::RegisterBackEndHooks()
 	app.RegisterHook("DrawIndexedPrimitive", (uint64_t)DX9_DrawIndexedPrimitive_Addr, (uint64_t)ProvidedDetours::DrawIndexedPrimitive_Detour);
 	app.RegisterHook("Reset",                (uint64_t)DX9_Reset_Addr,                (uint64_t)ProvidedDetours::Reset_Detour);
 #elifdef DirectX10
-	//todo
+	app.RegisterHook("Present",              (uint64_t)DX10_Present_Addr,             (uint64_t)ProvidedDetours::Present_Detour);
 #elifdef DirectX11
 	app.RegisterHook("Present",              (uint64_t)DX11_Present_Addr,             (uint64_t)ProvidedDetours::Present_Detour);
 #elifdef AnyOpenGLActive
