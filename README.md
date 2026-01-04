@@ -175,9 +175,9 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             if (app.IsKeyChordPressed(AppKeys::LEFT_SHIFT, AppKeys::DEL))
             {
-                //flag to the Shutdown call that we want to tear down EVERYTHING-
-				//and not trying to just reload imgui.
-                app.Start_Eject();
+                //flag to the Shutdown call that we want to tear down EVERYTHING
+				//including hooks etc.
+                app.SignalEject();
                 break;
             }
         }
