@@ -134,8 +134,7 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
         app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4'
-        app.Update_HWND(GetGameWindowHandle());
-        app.UpdateDirectXDevice(reinterpret_cast<void*>(device)); 
+        app.UpdateDirectXDevice(device); 
 #elifdef DirectX11
         app.Update_HWND(GetWindowHandle());
 		app.Set_TargetWindowInfo("game window title", "window class name");
