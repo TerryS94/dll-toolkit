@@ -495,14 +495,14 @@ void App::UpdateDirectXDevice(IDirect3DDevice9* device)
 	UpdateDirectXSwapChainVTable();
 }
 #elifdef DirectX10
-void App::UpdateDirectXSwapChain(uintptr_t swapChainAddr)
+void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
 {
-	IDXGISwapChain* newSwap = nullptr;
-	if (swapChainAddr) newSwap = *reinterpret_cast<IDXGISwapChain**>(swapChainAddr);
+	IDXGISwapChain* newSwap = swapChain;
 	if (newSwap == dxSwapChain) return;
 	if (newSwap) newSwap->AddRef();
 	if (dxSwapChain) dxSwapChain->Release();
 	dxSwapChain = newSwap;
+	UpdateDirectXSwapChainVTable();
 }
 #elifdef DirectX11
 void App::UpdateDirectXContextVTable()
@@ -569,7 +569,7 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename)
 	int width = 0, height = 0, channels = 0;
 	unsigned char* pixels = stbi_load(filename, &width, &height, &channels, 4);
 	if (!pixels) return nullptr;
-	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(device);
+	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(dxDevice);
 	D3D10_TEXTURE2D_DESC desc = {};
 	desc.Width = (UINT)width;
 	desc.Height = (UINT)height;
@@ -599,7 +599,7 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t siz
 	int width = 0, height = 0, channels = 0;
 	unsigned char* pixels = stbi_load_from_memory((const unsigned char*)data, (int)size, &width, &height, &channels, 4);
 	if (!pixels) return nullptr;
-	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(device);
+	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(dxDevice);
 	D3D10_TEXTURE2D_DESC desc = {};
 	desc.Width = (UINT)width;
 	desc.Height = (UINT)height;

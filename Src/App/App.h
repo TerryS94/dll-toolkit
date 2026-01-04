@@ -533,7 +533,7 @@ public: //public because its easier to use them in the hooks because using a get
 	ID3D10Device* dxDevice = nullptr;
 	IDXGISwapChain* dxSwapChain = nullptr;
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
-	void UpdateDirectXSwapChain(uintptr_t swapChainAddr);
+	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
 #elifdef DirectX11
 	ID3D11Device* dxDevice = nullptr;
 	IDXGISwapChain* dxSwapChain = nullptr;
