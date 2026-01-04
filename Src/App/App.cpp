@@ -53,16 +53,16 @@ void App::InitRenderer()
 #endif
 
 #ifdef DirectX9
-	assert(device && "device was nullptr!");
-	ImGui_ImplDX9_Init(reinterpret_cast<IDirect3DDevice9*>(device));
+	assert(dxDevice && "device was nullptr!");
+	ImGui_ImplDX9_Init(dxDevice);
 #elifdef DirectX10
-	assert(device && "device was nullptr!");
-	ImGui_ImplDX10_Init(reinterpret_cast<ID3D10Device*>(device));
+	assert(dxDevice && "device was nullptr!");
+	ImGui_ImplDX10_Init(dxDevice);
 #elifdef DirectX11
-	assert(device && "device was nullptr!");
-	assert(swapChain && "swapChain was nullptr!");
-	assert(context && "context was nullptr!");
-	ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(device), reinterpret_cast<ID3D11DeviceContext*>(context));
+	assert(dxDevice && "device was nullptr!");
+	assert(dxSwapChain && "swapChain was nullptr!");
+	assert(dxContext && "context was nullptr!");
+	ImGui_ImplDX11_Init(dxDevice, dxContext);
 #elifdef OpenGL2
 	ImGui_ImplWin32_InitForOpenGL(hwnd);
 	ImGui_ImplOpenGL2_Init();
@@ -143,8 +143,9 @@ void App::BeginFrame(bool want_mouse_this_frame)
 
 	lastMouseState = want_mouse_this_frame;
 
-	auto& io = ImGui::GetIO();
-	if (ImGui::GetCurrentContext()) io.MouseDrawCursor = want_mouse_this_frame;
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseDrawCursor = want_mouse_this_frame;
+	io.ConfigFlags = ImGuiConfigFlags_None;
 	//if a cursor is not explicitly given to us, completely drop mouse support just in case the user is rendering any HUD then they can't
 	//accidentally click and drag to move stuff around even though they never intended to.
 	if (!want_mouse_this_frame) io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
@@ -177,6 +178,7 @@ void App::EndFrame() const
 #elifdef DirectX10
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
 #elifdef DirectX11
+	dxContext->OMSetRenderTargets(1, &dxMainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
@@ -447,63 +449,95 @@ void App::GL_DestroyTexture(GLTexture& t)
 #endif
 
 #ifdef AnyDirectXActive
-void App::UpdateDirectX_VTables()
+void App::UpdateDirectXDeviceVTable()
 {
-	if (!device)
+	if (!dxDevice)
 	{
-		MessageBox(nullptr, "Device invalid!", "DX Device Invalid", MB_OK);
+		MessageBox(nullptr, "Device invalid!", "Called from UpdateDirectXDeviceVTable", MB_OK);
 		return;
 	}
-
-	DeviceVTable = *reinterpret_cast<void***>(device);
-
+	dxDeviceVTable = *reinterpret_cast<void***>(dxDevice);
+	UpdateDirectXSwapChainVTable();
+}
+void App::UpdateDirectXSwapChainVTable()
+{
 #ifdef DirectX9
-	IDirect3DSwapChain9* localSwapChain = nullptr;
-	reinterpret_cast<IDirect3DDevice9*>(device)->GetSwapChain(0, &localSwapChain);
-	if (!localSwapChain)
+	if (!dxDevice)
 	{
-		MessageBox(nullptr, "Couldn't obtain the DirectX Swapchain!\n", "DX Error", MB_OK | MB_ICONERROR);
+		MessageBox(nullptr, "DX9 device is null!\n", "Called from UpdateDirectXSwapChainVTable", MB_OK | MB_ICONERROR);
 		ExitProcess(EXIT_FAILURE);
 	}
-	SwapChainVTable = *reinterpret_cast<void***>(localSwapChain);
-	localSwapChain->Release();
+
+	IDirect3DSwapChain9* temp = nullptr;
+	HRESULT hr = dxDevice->GetSwapChain(0, &temp);
+	if (FAILED(hr) || !temp)
+	{
+		MessageBox(nullptr, "Couldn't obtain the DirectX9 SwapChain!\n", "Called from UpdateDirectXSwapChainVTable", MB_OK | MB_ICONERROR);
+		ExitProcess(EXIT_FAILURE);
+	}
+	dxSwapChainVTable = *reinterpret_cast<void***>(temp);
+	temp->Release();
 #elif defined DirectX10 || defined DirectX11
-	SwapChainVTable = *reinterpret_cast<void***>(swapChain);
+	if (dxSwapChain) dxSwapChainVTable = *reinterpret_cast<void***>(dxSwapChain);
+#endif
+}
 #endif
 
-#ifdef DirectX11
-	if (context)
-		ContextVTable = *reinterpret_cast<void***>(context);
+#ifdef DirectX9
+void App::UpdateDirectXDevice(IDirect3DDevice9* device)
+{
+	IDirect3DDevice9* newDev = device;
+	if (newDev == dxDevice) return;
+	if (newDev) newDev->AddRef();
+	if (dxDevice) dxDevice->Release();
+	dxDevice = newDev;
+	UpdateDirectXDeviceVTable();
+	UpdateDirectXSwapChainVTable();
+}
+#elifdef DirectX10
+void App::UpdateDirectXSwapChain(uintptr_t swapChainAddr)
+{
+	IDXGISwapChain* newSwap = nullptr;
+	if (swapChainAddr) newSwap = *reinterpret_cast<IDXGISwapChain**>(swapChainAddr);
+	if (newSwap == dxSwapChain) return;
+	if (newSwap) newSwap->AddRef();
+	if (dxSwapChain) dxSwapChain->Release();
+	dxSwapChain = newSwap;
+}
+#elifdef DirectX11
+void App::UpdateDirectXContextVTable()
+{
+	reinterpret_cast<ID3D11Device*>(dxDevice)->GetImmediateContext(&dxContext);
+	if (dxContext)
+		dxContextVTable = *reinterpret_cast<void***>(dxContext);
 	else
-	{
-		ID3D11DeviceContext* localContext = nullptr;
-		reinterpret_cast<ID3D11Device*>(device)->GetImmediateContext(&localContext);
-		if (localContext)
-		{
-			ContextVTable = *reinterpret_cast<void***>(localContext);
-			localContext->Release();
-		}
-		else
-			MessageBox(nullptr, "Couldn't obtain the D3D11 immediate context", "DX Error", MB_OK | MB_ICONERROR);
-	}
-#endif
+		MessageBox(nullptr, "Couldn't obtain the DirectX11 immediate context", "DX Error", MB_OK | MB_ICONERROR);
+}
+void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
+{
+	IDXGISwapChain* newSwap = swapChain;
+	if (newSwap == dxSwapChain) return;
+	if (newSwap) newSwap->AddRef();
+	if (dxSwapChain) dxSwapChain->Release();
+	dxSwapChain = newSwap;
+	UpdateDirectXSwapChainVTable();
 }
 #endif
 
 	
 #if defined DirectX9 || defined DirectX10 || defined DirectX11
-void* App::GetDirectXDeviceMethodByIndex(int index)
+void* App::GetDirectXDeviceMethodByIndex(int index) const
 {
-	return DeviceVTable[index];
+	return dxDeviceVTable[index];
 }
-void* App::GetDirectXSwapChainMethodByIndex(int index)
+void* App::GetDirectXSwapChainMethodByIndex(int index) const
 {
-	return SwapChainVTable[index];
+	return dxSwapChainVTable[index];
 }
 #if defined(DirectX11)
-void* App::GetDirectXContextMethodByIndex(int index)
+void* App::GetDirectXContextMethodByIndex(int index) const
 {
-	return ContextVTable[index];
+	return dxContextVTable[index];
 }
 #endif
 #endif
@@ -512,7 +546,7 @@ void* App::GetDirectXContextMethodByIndex(int index)
 PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
 {
 	PDIRECT3DTEXTURE9 baseTexture = nullptr;
-	HRESULT hr = D3DXCreateTextureFromFileExA(reinterpret_cast<LPDIRECT3DDEVICE9>(device), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
+	HRESULT hr = D3DXCreateTextureFromFileExA(reinterpret_cast<LPDIRECT3DDEVICE9>(dxDevice), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
 	if (FAILED(hr) || !baseTexture)
 	{
 		MessageBox(nullptr, std::format("Loading base texture failed for \"{}\".", filename).c_str(), "DX9_LoadTextureFromFile fail", MB_OK);
@@ -523,7 +557,7 @@ PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
 PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size)
 {
 	PDIRECT3DTEXTURE9 texture = nullptr;
-	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(reinterpret_cast<LPDIRECT3DDEVICE9>(device), data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
+	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(reinterpret_cast<LPDIRECT3DDEVICE9>(dxDevice), data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
 	if (result != S_OK)
 		return nullptr;
 	return texture;
@@ -611,7 +645,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromFile(const char* filename)
 	sub.pSysMem = pixels;
 	sub.SysMemPitch = (UINT)(width * 4);
 	ID3D11Texture2D* tex = nullptr;
-	ID3D11Device* dev = reinterpret_cast<ID3D11Device*>(device);
+	ID3D11Device* dev = reinterpret_cast<ID3D11Device*>(dxDevice);
 	HRESULT hr = dev->CreateTexture2D(&texDesc, &sub, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
@@ -642,11 +676,11 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 	sub.pSysMem = pixels;
 	sub.SysMemPitch = (UINT)(width * 4);
 	ID3D11Texture2D* tex = nullptr;
-	HRESULT hr = reinterpret_cast<ID3D11Device*>(device)->CreateTexture2D(&texDesc, &sub, &tex);
+	HRESULT hr = reinterpret_cast<ID3D11Device*>(dxDevice)->CreateTexture2D(&texDesc, &sub, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
 	ID3D11ShaderResourceView* srv = nullptr;
-	hr = reinterpret_cast<ID3D11Device*>(device)->CreateShaderResourceView(tex, nullptr, &srv);
+	hr = reinterpret_cast<ID3D11Device*>(dxDevice)->CreateShaderResourceView(tex, nullptr, &srv);
 	tex->Release();
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;

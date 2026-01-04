@@ -4,7 +4,7 @@ namespace ProvidedDetours
 {
 	HRESULT __stdcall Reset_Detour(LPDIRECT3DDEVICE9 pD3D9, D3DPRESENT_PARAMETERS* pPresentationParameters)
 	{
-		if (pD3D9 != app.GetDirectXDevice()) return app.GetOriginalFunction<tDX9_Reset>("Reset")(pD3D9, pPresentationParameters);
+		if (pD3D9 != app.dxDevice) return app.GetOriginalFunction<tDX9_Reset>("Reset")(pD3D9, pPresentationParameters);
 
 		app.FreeResources();
 		if (app.HasInitializedFirstTime()) app.ImGui_InvalidateDeviceObjects();
@@ -33,6 +33,7 @@ namespace ProvidedDetours
 	}
 	HRESULT __stdcall EndScene_Detour(LPDIRECT3DDEVICE9 pD3D9)
 	{
+		MainRender();
 		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
 		return result;
 	}

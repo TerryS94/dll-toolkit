@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX9
+#define DirectX11
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -514,43 +514,36 @@ public:
 	//get a pointer to any texture by name that was loaded via AddTextureFromMemory/AddTextureFromFile
 	NODISCARD CustomTexture* GetTextureByName(const std::string_view& textureName);
 
-#if defined DirectX9 || defined DirectX10 || defined DirectX11
-	//use vtable index to access specific functions within the provided table.
-    NODISCARD void* GetDirectXDeviceMethodByIndex(int index);
-	//use vtable index to access specific functions within the provided table.
-    NODISCARD void* GetDirectXSwapChainMethodByIndex(int index);
-#endif
-#if defined DirectX11
-	//use vtable index to access specific functions within the provided table.
-	void* GetDirectXContextMethodByIndex(int index);
-#endif
-
-#if defined DirectX10 || defined DirectX11
-private:
-	void* context = nullptr;
-	void** ContextVTable = nullptr;
-public:
-	inline void UpdateDirectXContext(void* context) { this->context = context; UpdateDirectX_VTables(); }
-#endif
-
 #ifdef AnyDirectXActive
 private:
-	void* device = nullptr;
-	void* swapChain = nullptr;
-	void** DeviceVTable = nullptr;
-	void** SwapChainVTable = nullptr;
-	void UpdateDirectX_VTables();
+	void** dxDeviceVTable = nullptr;
+	void** dxSwapChainVTable = nullptr;
 public:
-	//return a pointer to the last known device that App knows about
-    NODISCARD inline void* GetDirectXDevice() { return device; }
-	//make App aware of the latest valid device pointer for your target. this will also update the directx vtables too.
-	inline void UpdateDirectXDevice(void* device) { this->device = device; UpdateDirectX_VTables(); };
-#ifdef DirectX11
-	inline void UpdateDirectXSwapChain(void* swapChain) { this->swapChain = swapChain; UpdateDirectX_VTables(); };
-#endif
+	void UpdateDirectXDeviceVTable();
+	void UpdateDirectXSwapChainVTable();
+	NODISCARD void* GetDirectXDeviceMethodByIndex(int index) const;
+	NODISCARD void* GetDirectXSwapChainMethodByIndex(int index) const;
 #endif
 
-#if defined AnyOpenGLActive
+public: //public because its easier to use them in the hooks because using a getter would cause leaks
+#ifdef DirectX9
+	IDirect3DDevice9* dxDevice = nullptr;
+	void UpdateDirectXDevice(IDirect3DDevice9* device);
+#elifdef DirectX10
+	ID3D10Device* dxDevice = nullptr;
+	IDXGISwapChain* dxSwapChain = nullptr;
+	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
+	void UpdateDirectXSwapChain(uintptr_t swapChainAddr);
+#elifdef DirectX11
+	ID3D11Device* dxDevice = nullptr;
+	IDXGISwapChain* dxSwapChain = nullptr;
+	ID3D11DeviceContext* dxContext = nullptr;
+	void** dxContextVTable = nullptr;
+	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
+	void* GetDirectXContextMethodByIndex(int index) const;
+	void UpdateDirectXContextVTable();
+	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
+#elifdef AnyOpenGLActive
 private:
 	const char* glsl_version = nullptr;
 public:
