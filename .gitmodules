@@ -3,5 +3,5 @@
 	url = https://github.com/ocornut/imgui.git
 [submodule "DirectX9"]
 	path = DirectX9
-	url = git@github.com:TerryS94/DirectX9.git
+	url = https://github.com/TerryS94/DirectX9.git
 	branch = main
