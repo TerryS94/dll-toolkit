@@ -12,7 +12,7 @@ namespace ProvidedDetours
     }
 	BOOL WINAPI SwapBuffers_Detour(HDC hdc)
 	{
-        MainRender();//replace with yours
+        app.Call_UserRenderFunction();
 		BOOL result = app.GetOriginalFunction<tOpenGL_SwapBuffers>("SwapBuffers")(hdc);
 		return result;
 	}

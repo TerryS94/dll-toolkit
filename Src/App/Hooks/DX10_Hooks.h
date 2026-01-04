@@ -1,5 +1,5 @@
 #pragma once
-#include "Main.h"
+#include "App/App.h"
 
 typedef HRESULT(__stdcall* tDX10_Present)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef void(__stdcall* tDX10_DrawIndexed)(ID3D10Device* pDevice, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation);

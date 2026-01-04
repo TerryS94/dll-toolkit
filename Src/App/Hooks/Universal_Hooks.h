@@ -1,5 +1,5 @@
 #pragma once
-#include "Main.h"
+#include "App/App.h"
 
 //ready-to-go hooks that will work regardless of the backend/renderer hence "Universal"
 //for backend specific hooks, check out Hooks/{backend_name}_Hooks.h

@@ -354,6 +354,7 @@ private:
 	bool hasMouseCursor = false;
 	bool wantFreeCursor = false;
 	std::function<void()> userInitResources;
+	std::function<void()> userRenderFunc;
 
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
@@ -497,9 +498,13 @@ public:
 	inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
 	//set your InitResources function pointer here so that way the hooking side of things is handled automatically.
 	inline void Set_InitResourcesFunc(std::function<void()> initResources) { userInitResources = std::move(initResources); };
+	//set your "OnRender" function pointer here so that way it can be called in the hooks automatically.
+	inline void Set_UserRenderFunc(std::function<void()> MainRender) { userRenderFunc = std::move(MainRender); };
 	//For hooks etc to call automatically. You can ignore this.
 	//Will call the user's InitResources function which App is made aware of by the user defining it on inject with the Set_InitResourcesFunc function
 	inline void Call_UserInitResources() { if (userInitResources) userInitResources(); };
+	//Will call the user's "OnRender" function which App is made aware of by the user defining it on inject with the Set_UserRenderFunction function
+	inline void Call_UserRenderFunction() { if (userRenderFunc) userRenderFunc(); };
 
 	//register a font from memory
 	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);

@@ -25,7 +25,7 @@ namespace ProvidedDetours
         }
         else
         {
-            MainRender();//replace with your
+            app.Call_UserRenderFunction();
         }
 
 		HRESULT result = app.GetOriginalFunction<tDX10_Present>("Present")(pSwapChain, SyncInterval, Flags);

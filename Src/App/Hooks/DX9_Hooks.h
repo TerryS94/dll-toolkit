@@ -1,5 +1,5 @@
 #pragma once
-#include "Main.h"
+#include "App/App.h"
 
 typedef HRESULT(__stdcall* tDX9_Reset)(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS*);
 typedef HRESULT(__stdcall* tDX9_BeginScene) (LPDIRECT3DDEVICE9);

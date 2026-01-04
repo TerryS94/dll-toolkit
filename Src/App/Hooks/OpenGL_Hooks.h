@@ -1,5 +1,5 @@
 #pragma once
-#include "Main.h"
+#include "App/App.h"
 
 typedef BOOL(__stdcall* tOpenGL_SwapBuffers)(HDC hdc);
 typedef BOOL(__stdcall* tWglMakeCurrent)(HDC hdc, HGLRC hglrc);
