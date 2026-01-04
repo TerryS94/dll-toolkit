@@ -137,7 +137,8 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 	{
 		app.Set_PriorityClass(HIGH_PRIORITY_CLASS); //optional
 		//pass your InitResources to App so it can call it where it needs to in the provided hooks
-		app.Set_InitResourcesFunc(InitResources);
+		app.Set_InitResourcesFunc(InitResources);//toolkit can now automatically call your init resources in certain hooks
+		app.Set_UserRenderFunc(MainRender);//toolkit can now automatically call your render function where it needs to.
 
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
