@@ -127,15 +127,14 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
-        app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4' which uses DX9 backend
+        app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4'
         app.Update_HWND(GetGameWindowHandle());
         app.UpdateDirectXDevice(reinterpret_cast<void*>(device)); 
 #elifdef DirectX11
         app.Update_HWND(GetWindowHandle());
 		app.Set_TargetWindowInfo("game window title", "window class name");
-        app.UpdateDirectXDevice(*reinterpret_cast<void**>(0x35AE484)); //example
-        app.UpdateDirectXSwapChain(*reinterpret_cast<void**>(0x35E5F94)); //example
-        app.UpdateDirectXContext(*reinterpret_cast<void**>(0x35AE488)); //example
+		//dx device and context are derived from the swapchain
+        app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//example for BO2 Plutonium version
 #elifdef AnyOpenGLActive
         app.Set_TargetWindowInfo("MX Bikes", "Core Window Class");//example for the game 'MX Bikes'
         app.SetGLSLVersion("#version 330 core");
