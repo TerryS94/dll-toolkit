@@ -66,18 +66,23 @@ void MainRender()
     static bool calledInitFirstTime = false;
     if (!app.HasInitializedFirstTime() && !calledInitFirstTime)
     {
-#if defined AnyDirectXActive
-        if (HWND hwnd = GetGameWindowHandle())
+#ifdef DirectX9
+        if (HWND hwnd = GetWindowHandle())
         {
             calledInitFirstTime = true;
+            app.Update_HWND(hwnd);
             app.InitRenderer();
-            InitResources();
+            app.Call_UserInitResources();
         }
+#elif defined DirectX10 || defined DirectX11 //Present function will first derive the device and rendertargetview and hwnd etc then we can finally init
+        calledInitFirstTime = true;
+        app.InitRenderer();
+        app.Call_UserInitResources();
 #elifdef AnyOpenGLActive
         calledInitFirstTime = true;
         app.Update_HWND(GetWindowHandle());
         app.InitRenderer();
-        InitResources();
+        app.Call_UserInitResources();
 #endif
     }
     //triggers when changing the window resolution or some other event that requires a hard reload
