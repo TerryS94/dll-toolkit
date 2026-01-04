@@ -540,7 +540,7 @@ void* App::GetDirectXContextMethodByIndex(int index) const
 PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
 {
 	PDIRECT3DTEXTURE9 baseTexture = nullptr;
-	HRESULT hr = D3DXCreateTextureFromFileExA(reinterpret_cast<LPDIRECT3DDEVICE9>(dxDevice), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
+	HRESULT hr = D3DXCreateTextureFromFileExA(dxDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
 	if (FAILED(hr) || !baseTexture)
 	{
 		MessageBox(nullptr, std::format("Loading base texture failed for \"{}\".", filename).c_str(), "DX9_LoadTextureFromFile fail", MB_OK);
@@ -551,7 +551,7 @@ PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
 PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size)
 {
 	PDIRECT3DTEXTURE9 texture = nullptr;
-	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(reinterpret_cast<LPDIRECT3DDEVICE9>(dxDevice), data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
+	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(dxDevice, data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
 	if (result != S_OK)
 		return nullptr;
 	return texture;
@@ -563,7 +563,6 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename)
 	int width = 0, height = 0, channels = 0;
 	unsigned char* pixels = stbi_load(filename, &width, &height, &channels, 4);
 	if (!pixels) return nullptr;
-	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(dxDevice);
 	D3D10_TEXTURE2D_DESC desc = {};
 	desc.Width = (UINT)width;
 	desc.Height = (UINT)height;
@@ -578,11 +577,11 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename)
 	init.SysMemPitch = (UINT)(width * 4);
 	init.SysMemSlicePitch = 0;
 	ID3D10Texture2D* tex = nullptr;
-	HRESULT hr = dev->CreateTexture2D(&desc, &init, &tex);
+	HRESULT hr = dxDevice->CreateTexture2D(&desc, &init, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
 	ID3D10ShaderResourceView* srv = nullptr;
-	hr = dev->CreateShaderResourceView(tex, nullptr, &srv);
+	hr = dxDevice->CreateShaderResourceView(tex, nullptr, &srv);
 	tex->Release();
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
@@ -593,7 +592,6 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t siz
 	int width = 0, height = 0, channels = 0;
 	unsigned char* pixels = stbi_load_from_memory((const unsigned char*)data, (int)size, &width, &height, &channels, 4);
 	if (!pixels) return nullptr;
-	ID3D10Device* dev = reinterpret_cast<ID3D10Device*>(dxDevice);
 	D3D10_TEXTURE2D_DESC desc = {};
 	desc.Width = (UINT)width;
 	desc.Height = (UINT)height;
@@ -608,11 +606,11 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t siz
 	init.SysMemPitch = (UINT)(width * 4);
 	init.SysMemSlicePitch = 0;
 	ID3D10Texture2D* tex = nullptr;
-	HRESULT hr = dev->CreateTexture2D(&desc, &init, &tex);
+	HRESULT hr = dxDevice->CreateTexture2D(&desc, &init, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
 	ID3D10ShaderResourceView* srv = nullptr;
-	hr = dev->CreateShaderResourceView(tex, nullptr, &srv);
+	hr = dxDevice->CreateShaderResourceView(tex, nullptr, &srv);
 	tex->Release();
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
@@ -639,12 +637,11 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromFile(const char* filename)
 	sub.pSysMem = pixels;
 	sub.SysMemPitch = (UINT)(width * 4);
 	ID3D11Texture2D* tex = nullptr;
-	ID3D11Device* dev = reinterpret_cast<ID3D11Device*>(dxDevice);
-	HRESULT hr = dev->CreateTexture2D(&texDesc, &sub, &tex);
+	HRESULT hr = dxDevice->CreateTexture2D(&texDesc, &sub, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
 	ID3D11ShaderResourceView* srv = nullptr;
-	hr = dev->CreateShaderResourceView(tex, nullptr, &srv);
+	hr = dxDevice->CreateShaderResourceView(tex, nullptr, &srv);
 	tex->Release();
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
@@ -670,11 +667,11 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 	sub.pSysMem = pixels;
 	sub.SysMemPitch = (UINT)(width * 4);
 	ID3D11Texture2D* tex = nullptr;
-	HRESULT hr = reinterpret_cast<ID3D11Device*>(dxDevice)->CreateTexture2D(&texDesc, &sub, &tex);
+	HRESULT hr = dxDevice->CreateTexture2D(&texDesc, &sub, &tex);
 	stbi_image_free(pixels);
 	if (FAILED(hr) || !tex) return nullptr;
 	ID3D11ShaderResourceView* srv = nullptr;
-	hr = reinterpret_cast<ID3D11Device*>(dxDevice)->CreateShaderResourceView(tex, nullptr, &srv);
+	hr = dxDevice->CreateShaderResourceView(tex, nullptr, &srv);
 	tex->Release();
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
@@ -706,8 +703,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //	}
 //	else pixels = reinterpret_cast<unsigned char*>(data);
 //
-//	ID3D12Device* dev = reinterpret_cast<ID3D12Device*>(device);
-//	if (!dev)
+//	if (!dxDevice)
 //	{
 //		if (pixels_owned) stbi_image_free(pixels);
 //		return nullptr;
@@ -730,7 +726,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //	defaultHeapProps.VisibleNodeMask = 1;
 //
 //	ID3D12Resource* defaultResource = nullptr;
-//	HRESULT hr = dev->CreateCommittedResource(&defaultHeapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&defaultResource));
+//	HRESULT hr = dxDevice->CreateCommittedResource(&defaultHeapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&defaultResource));
 //	if (FAILED(hr) || !defaultResource)
 //	{
 //		if (pixels_owned) stbi_image_free(pixels);
@@ -741,7 +737,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //	UINT numRows = 0;
 //	UINT64 rowSizeInBytes = 0;
 //	UINT64 requiredSize = 0;
-//	dev->GetCopyableFootprints(&desc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &requiredSize);
+//	dxDevice->GetCopyableFootprints(&desc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &requiredSize);
 //	D3D12_HEAP_PROPERTIES uploadHeapProps = {};
 //	uploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
 //	uploadHeapProps.CreationNodeMask = 1;
@@ -757,7 +753,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //	uploadDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 //	uploadDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 //	ID3D12Resource* uploadResource = nullptr;
-//	hr = dev->CreateCommittedResource(&uploadHeapProps, D3D12_HEAP_FLAG_NONE, &uploadDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadResource));
+//	hr = dxDevice->CreateCommittedResource(&uploadHeapProps, D3D12_HEAP_FLAG_NONE, &uploadDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadResource));
 //	if (FAILED(hr) || !uploadResource)
 //	{
 //		defaultResource->Release();
@@ -803,15 +799,15 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //		return nullptr;
 //	};
 //
-//	if (FAILED(dev->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc))))
+//	if (FAILED(dxDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc))))
 //		return cleanup_and_return();
-//	if (FAILED(dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, nullptr, IID_PPV_ARGS(&cmdList))))
+//	if (FAILED(dxDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, nullptr, IID_PPV_ARGS(&cmdList))))
 //		return cleanup_and_return();
 //
 //	D3D12_COMMAND_QUEUE_DESC qdesc = {};
 //	qdesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 //	qdesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-//	if (FAILED(dev->CreateCommandQueue(&qdesc, IID_PPV_ARGS(&cmdQueue)))) return cleanup_and_return();
+//	if (FAILED(dxDevice->CreateCommandQueue(&qdesc, IID_PPV_ARGS(&cmdQueue)))) return cleanup_and_return();
 //	D3D12_TEXTURE_COPY_LOCATION dstLoc = {};
 //	dstLoc.pResource = defaultResource;
 //	dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
@@ -833,7 +829,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t siz
 //	if (FAILED(hr)) return cleanup_and_return();
 //	ID3D12CommandList* listsToExecute[] = { cmdList };
 //	cmdQueue->ExecuteCommandLists(1, listsToExecute);
-//	if (FAILED(dev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) return cleanup_and_return();
+//	if (FAILED(dxDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) return cleanup_and_return();
 //	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 //	if (!fenceEvent) return cleanup_and_return();
 //	if (FAILED(cmdQueue->Signal(fence, fenceValue))) return cleanup_and_return();
