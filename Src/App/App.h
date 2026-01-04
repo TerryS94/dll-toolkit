@@ -465,8 +465,9 @@ public:
 	NODISCARD inline FARPROC Get_ProcAddress(const char* mod, const char* function) { HMODULE m = GetModuleHandle(mod); if (!m) return nullptr; return GetProcAddress(m, function); }
 	//are we in the process of unloading our dll?
 	NODISCARD inline bool IsEjecting() const { return isEjectingDLL; }
-	//make this the first thing you call when you flag your dll to begin ejecting so certain sections unload properly
-	inline void Start_Eject() { this->Set_RendererActive(false); isEjectingDLL = true; }
+	//make this the first thing you call when you flag your dll to eject so that certain sections unload properly in Shutdown
+	//because Shutdown is also called for reloading ImGui
+	inline void SignalEject() { this->Set_RendererActive(false); isEjectingDLL = true; }
 	//toggle your main tool overlay on/off
 	inline void ToggleMenu(bool open) { isMenuOpen = open; if (!isMenuOpen) wantFreeCursor = false; }
 	//is our tool overlay open/visible?
