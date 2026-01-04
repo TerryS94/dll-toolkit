@@ -70,7 +70,7 @@ static void DrawStuff()
 //call this in the appropriate provided hook such as EndScene for DX9 which is located in App/Hooks/DX9_Hooks.cpp
 void MainRender()
 {
-    //ensure we only ever go into the second if statement exactly one time.
+    //ensure we only ever run first time init once
     static bool calledInitFirstTime = false;
     if (!app.HasInitializedFirstTime() && !calledInitFirstTime)
     {
