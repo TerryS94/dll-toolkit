@@ -242,6 +242,7 @@ void App::RegisterBackEndHooks()
 	app.RegisterHook("EndScene",             (uint64_t)DX9_EndScene_Addr,             (uint64_t)ProvidedDetours::EndScene_Detour);
 	app.RegisterHook("DrawIndexedPrimitive", (uint64_t)DX9_DrawIndexedPrimitive_Addr, (uint64_t)ProvidedDetours::DrawIndexedPrimitive_Detour);
 	app.RegisterHook("Reset",                (uint64_t)DX9_Reset_Addr,                (uint64_t)ProvidedDetours::Reset_Detour);
+	app.RegisterHook("Present",              (uint64_t)DX9_Present_Addr,              (uint64_t)ProvidedDetours::Present_Detour);
 #elifdef DirectX10
 	app.RegisterHook("Present",              (uint64_t)DX10_Present_Addr,             (uint64_t)ProvidedDetours::Present_Detour);
 #elifdef DirectX11
