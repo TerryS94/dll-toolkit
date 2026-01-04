@@ -22,7 +22,7 @@ vcpkg install polyhook2:x86-windows-static polyhook2:x64-windows-static
 
 # Example Usage
 ### Here is a simple dllmain.cpp example you can achieve with this framework in it's current state
-- It would be even less code if this example only focused on a single game example :)
+- even less code if this example only focused on a single game :)
 
 ```cpp
 //the flow of things may evolve with time... but even already
@@ -31,6 +31,8 @@ vcpkg install polyhook2:x86-windows-static polyhook2:x64-windows-static
 //inside this App header at the top you can mess with the configuration (which backend you want etc)
 #include "App/App.h"
 
+//define a function like this for your textures/fonts and pass-
+//the function pointer into app.Set_InitResourcesFunc on inject
 void InitResources()
 {
     app.AddTextureFromFile("UniqueName1", "C:\\some_location\\image.png");
@@ -75,7 +77,7 @@ void MainRender()
         calledInitFirstTime = true;
         app.Update_HWND(GetWindowHandle());
         app.InitRenderer();
-        InitResources();//user provided function
+        InitResources();
 #endif
     }
     //triggers when changing the window resolution or some other event that requires a hard reload
@@ -86,7 +88,7 @@ void MainRender()
         {
             app.Set_RendererActive(false);
             app.Set_ImGui_Reload(false);
-#ifdef DirectX9 //an example for DX9
+#ifdef DirectX9
             app.UpdateDirectXDevice(GetGameDevicePtr());
 #endif
             app.Update_HWND(hwnd);
@@ -125,7 +127,7 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
-        app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4' which uses DirectX9 backend
+        app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4' which uses DX9 backend
         app.Update_HWND(GetGameWindowHandle());
         app.UpdateDirectXDevice(reinterpret_cast<void*>(device)); 
 #elifdef DirectX11
@@ -161,7 +163,8 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             if (app.IsKeyChordPressed(AppKeys::LEFT_SHIFT, AppKeys::DEL))
             {
-                //flag to the Shutdown call that we want to tear down EVERYTHING and not trying to just reload imgui.
+                //flag to the Shutdown call that we want to tear down EVERYTHING-
+				//and not trying to just reload imgui.
                 app.Start_Eject();
                 break;
             }
