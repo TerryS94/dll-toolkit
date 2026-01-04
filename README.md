@@ -120,6 +120,9 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 {
 	{
 		app.Set_PriorityClass(HIGH_PRIORITY_CLASS); //optional
+		//pass your InitResources to App so it can call it where it needs to in the provided hooks
+		app.Set_InitResourcesFunc(InitResources);
+
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
         app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4' which uses DirectX9 backend
