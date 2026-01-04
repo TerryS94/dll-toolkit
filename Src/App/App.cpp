@@ -494,16 +494,6 @@ void App::UpdateDirectXDevice(IDirect3DDevice9* device)
 	UpdateDirectXDeviceVTable();
 	UpdateDirectXSwapChainVTable();
 }
-#elifdef DirectX10
-void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
-{
-	IDXGISwapChain* newSwap = swapChain;
-	if (newSwap == dxSwapChain) return;
-	if (newSwap) newSwap->AddRef();
-	if (dxSwapChain) dxSwapChain->Release();
-	dxSwapChain = newSwap;
-	UpdateDirectXSwapChainVTable();
-}
 #elifdef DirectX11
 void App::UpdateDirectXContextVTable()
 {
@@ -513,6 +503,9 @@ void App::UpdateDirectXContextVTable()
 	else
 		MessageBox(nullptr, "Couldn't obtain the DirectX11 immediate context", "DX Error", MB_OK | MB_ICONERROR);
 }
+#endif
+
+#if defined DirectX10 || defined DirectX11
 void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
 {
 	IDXGISwapChain* newSwap = swapChain;
