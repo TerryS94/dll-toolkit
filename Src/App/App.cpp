@@ -498,7 +498,7 @@ void App::UpdateDirectXDevice(IDirect3DDevice9* device)
 #elifdef DirectX11
 void App::UpdateDirectXContextVTable()
 {
-	reinterpret_cast<ID3D11Device*>(dxDevice)->GetImmediateContext(&dxContext);
+	dxDevice->GetImmediateContext(&dxContext);
 	if (dxContext)
 		dxContextVTable = *reinterpret_cast<void***>(dxContext);
 	else
