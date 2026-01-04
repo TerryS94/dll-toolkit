@@ -1,14 +1,13 @@
-**This dll-toolkit is still ___very WIP___ but mostly working :)**
-
-This started out initially as a private project for convenience on future dll tools because it's annoying setting up some of the boiler plate before being able to get to the fun stuff, so recently I decided that it's finally time to solve that problem for myself and maybe even for others too :)
+Setting up boilerplate on every new project gets old fast, so this toolkit exists to let you skip it and work directly with the game’s own renderer from the start.
 
 ## What You Need First
-This framework does not create its own backend instances. It expects you to know basic reverse engineering so you can provide one of the following runtime pointers for the target game:
-- DirectX 9: the game’s IDirect3DDevice9*. Everything else is derived from that device.
-- DirectX10/11: the game’s IDXGISwapChain*. Everything else is derived from that swapchain.
-- OpenGL2/3: the GLSL version string (e.g. #version 330 core) that ImGui needs at init.
+This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following runtime pointers for your target game:
+- DirectX 9: the game’s ```IDirect3DDevice9*```. Everything else is derived from that device.
+- DirectX10/11: the game’s ```IDXGISwapChain*```. Everything else is derived from that swapchain.
+- OpenGL2/3: the GLSL version string (e.g. ```"#version 330 core"```) that ImGui needs at init.
 
-Once you provide one of these pointers, the framework attaches to the game’s real renderer instead of creating a dummy device.
+This lets the toolkit run on the game’s real renderer rather than a local dummy, so visuals, device state, and input match the game exactly.
+This may sound overkill if you only plan to make the simplest overlay, but if you know basic reverse engineering, providing the required field is usually quick.
 
 ## Project Setup
 - Add the **DirectX9** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
