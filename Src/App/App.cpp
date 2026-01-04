@@ -518,7 +518,7 @@ void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
 #endif
 
 	
-#if defined DirectX9 || defined DirectX10 || defined DirectX11
+#if defined AnyDirectXActive
 void* App::GetDirectXDeviceMethodByIndex(int index) const
 {
 	return dxDeviceVTable[index];
