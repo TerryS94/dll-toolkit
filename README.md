@@ -29,7 +29,7 @@ vcpkg install polyhook2:x86-windows-static polyhook2:x64-windows-static
 ```
 
 # Example Usage
-### Here is a simple dllmain.cpp example you can achieve with this framework in it's current state
+### Here is a simple dllmain.cpp sample you can achieve with this toolkit in it's current state
 - even less code if this example only focused on a single game :)
 
 ```cpp
