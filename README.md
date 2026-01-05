@@ -47,26 +47,6 @@ void InitResources()
     app.AddTextureFromMemory("UniqueName2", pngDataByteArray, sizeof(pngDataByteArray));
     //... similar functions for loading Fonts
 }
-static void DrawStuff()
-{
-    if (app.IsMenuOpen())
-    {
-#ifdef ImGui_IncludeDemo
-        ImGui::ShowDemoWindow();
-#endif
-        ImGui::Begin("##testwindow123", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-        {
-            ImGui::Text("Hello");
-            auto* customTexturePtr = app.GetTextureByName("UniqueName1");
-#ifdef AnyOpenGLActive
-            ImGui::Image((ImTextureID)(intptr_t)customTexturePtr->texture.id, ImVec2(64, 64));
-#elifdef AnyDirectXActive
-            ImGui::Image((ImTextureID)(intptr_t)customTexturePtr->ptr, ImVec2(64, 64));
-#endif
-            ImGui::End();
-        }
-    }
-}
 
 void MainRender()
 {
@@ -135,7 +115,20 @@ void MainRender()
 
     app.BeginFrame(want_mouse_this_frame);
 
-    DrawStuff();
+	if (isMenuOpen)
+	{
+#ifdef ImGui_IncludeDemo
+		ImGui::ShowDemoWindow();
+#endif
+		ImGui::Begin("##testwindow123", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text("hello");
+		auto* customTexturePtr = app.GetTextureByName("UniqueName1");
+		//for OpenGL
+		ImGui::Image((ImTextureID)(intptr_t)customTexturePtr->texture.id, ImVec2(64, 64));
+		//for DirectX9/10/11
+		ImGui::Image((ImTextureID)(intptr_t)customTexturePtr->ptr, ImVec2(64, 64));
+		ImGui::End();
+	}
 
     app.EndFrame();
 }
