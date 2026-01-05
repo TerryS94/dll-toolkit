@@ -11,7 +11,7 @@ namespace ProvidedDetours
             {
                 firstEverInit = true;
                 app.UpdateDirectXDeviceVTable();
-                app.dxDevice->GetImmediateContext(&app.dxContext);
+                app.UpdateDirectXContextVTable();
                 DXGI_SWAP_CHAIN_DESC desc;
                 pSwapChain->GetDesc(&desc);
                 app.Update_HWND(desc.OutputWindow);
