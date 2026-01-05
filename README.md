@@ -135,7 +135,7 @@ void MainRender()
     app.EndFrame();
 }
 
-DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
+DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
 {
 	{
 		app.Set_PriorityClass(HIGH_PRIORITY_CLASS); //optional
@@ -194,7 +194,7 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 	}
     FreeLibraryAndExitThread(app.Get_DLLHandle(), 0);
 }
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, MAYBEUNUSED LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, [[maybe_unused]] LPVOID lpReserved)
 {
     if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
