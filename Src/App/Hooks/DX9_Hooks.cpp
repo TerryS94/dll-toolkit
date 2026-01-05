@@ -2,7 +2,7 @@
 
 namespace ProvidedDetours
 {
-	HRESULT __stdcall Reset_Detour(LPDIRECT3DDEVICE9 pD3D9, D3DPRESENT_PARAMETERS* pPresentationParameters)
+	HRESULT __stdcall Reset_Detour(IDirect3DDevice9* pD3D9, D3DPRESENT_PARAMETERS* pPresentationParameters)
 	{
 		if (pD3D9 != app.dxDevice) return app.GetOriginalFunction<tDX9_Reset>("Reset")(pD3D9, pPresentationParameters);
 
@@ -31,7 +31,7 @@ namespace ProvidedDetours
 		HRESULT result = app.GetOriginalFunction<tDX9_BeginScene>("BeginScene")(pDevice);
 		return result;
 	}
-	HRESULT __stdcall EndScene_Detour(LPDIRECT3DDEVICE9 pD3D9)
+	HRESULT __stdcall EndScene_Detour(IDirect3DDevice9* pD3D9)
 	{
 		app.Call_UserRenderFunction();
 		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
@@ -52,7 +52,7 @@ namespace ProvidedDetours
 		__asm jmp originalPresent
 	}
 #pragma optimize("", on)
-	HRESULT __stdcall DrawIndexedPrimitive_Detour(LPDIRECT3DDEVICE9 pD3D9, D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
+	HRESULT __stdcall DrawIndexedPrimitive_Detour(IDirect3DDevice9* pD3D9, D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
 	{
 		HRESULT result = app.GetOriginalFunction<tDX9_DrawIndexedPrimitive>("DrawIndexedPrimitive")(pD3D9, Type, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
 		return result;
