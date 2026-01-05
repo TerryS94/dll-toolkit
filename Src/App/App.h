@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX9
+#define OpenGL2
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -299,7 +299,7 @@ public:
 	//in case you have something in another thread that needs to wait for this task to be done
 	NODISCARD inline bool ArePatchesInstalled() const { return patches_applied; }
 	//check if a specific hook has been installed by name
-	NODISCARD bool IsHookIntalled(const std::string_view& name);
+	NODISCARD bool IsHookIntalled(const std::string_view& name) const;
 };
 
 static thread_local int g_allowMouseWarpDepth = 0;
@@ -362,14 +362,14 @@ private:
 
 private:
 #ifdef DirectX9
-	PDIRECT3DTEXTURE9 DX9_LoadTextureFromFile(const char* filename);
-	PDIRECT3DTEXTURE9 DX9_LoadTextureFromMemory(void* data, size_t size);
+	PDIRECT3DTEXTURE9 DX9_LoadTextureFromFile(const char* filename) const;
+	PDIRECT3DTEXTURE9 DX9_LoadTextureFromMemory(void* data, size_t size) const;
 #elifdef DirectX10
-	ID3D10ShaderResourceView* DX10_LoadTextureFromFile(const char* filename);
-	ID3D10ShaderResourceView* DX10_LoadTextureFromMemory(void* data, size_t size);
+	ID3D10ShaderResourceView* DX10_LoadTextureFromFile(const char* filename) const;
+	ID3D10ShaderResourceView* DX10_LoadTextureFromMemory(void* data, size_t size) const;
 #elifdef DirectX11
-	ID3D11ShaderResourceView* DX11_LoadTextureFromFile(const char* filename);
-	ID3D11ShaderResourceView* DX11_LoadTextureFromMemory(void* data, size_t size);
+	ID3D11ShaderResourceView* DX11_LoadTextureFromFile(const char* filename) const;
+	ID3D11ShaderResourceView* DX11_LoadTextureFromMemory(void* data, size_t size) const;
 //#elifdef DirectX12
 //	ID3D12Resource* DX12_LoadTextureFromFile(const char* filename);
 //	ID3D12Resource* DX12_LoadTextureFromMemory(void* data, size_t size, int knownWidth = 0, int knownHeight = 0) const;

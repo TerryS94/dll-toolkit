@@ -537,7 +537,7 @@ void* App::GetDirectXContextMethodByIndex(int index) const
 #endif
 
 #ifdef DirectX9
-PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
+PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename) const
 {
 	PDIRECT3DTEXTURE9 baseTexture = nullptr;
 	HRESULT hr = D3DXCreateTextureFromFileExA(dxDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
@@ -548,7 +548,7 @@ PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename)
 	}
 	return baseTexture;
 }
-PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size)
+PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size) const
 {
 	PDIRECT3DTEXTURE9 texture = nullptr;
 	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(dxDevice, data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
@@ -557,7 +557,7 @@ PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size)
 	return texture;
 }
 #elifdef DirectX10
-ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename)
+ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename) const
 {
 	if (!filename || !filename[0]) return nullptr;
 	int width = 0, height = 0, channels = 0;
@@ -586,7 +586,7 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromFile(const char* filename)
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
 }
-ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t size)
+ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t size) const
 {
 	if (!data || size == 0) return nullptr;
 	int width = 0, height = 0, channels = 0;
@@ -616,7 +616,7 @@ ID3D10ShaderResourceView* App::DX10_LoadTextureFromMemory(void* data, size_t siz
 	return srv;
 }
 #elifdef DirectX11
-ID3D11ShaderResourceView* App::DX11_LoadTextureFromFile(const char* filename)
+ID3D11ShaderResourceView* App::DX11_LoadTextureFromFile(const char* filename) const
 {
 	if (!filename || !filename[0]) return nullptr;
 	int width = 0;
@@ -646,7 +646,7 @@ ID3D11ShaderResourceView* App::DX11_LoadTextureFromFile(const char* filename)
 	if (FAILED(hr) || !srv) return nullptr;
 	return srv;
 }
-ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t size)
+ID3D11ShaderResourceView* App::DX11_LoadTextureFromMemory(void* data, size_t size) const
 {
 	if (!data || size == 0) return nullptr;
 	int width = 0;
@@ -912,7 +912,7 @@ void HookingLayer::UninstallHooks()
 	hooks_applied = false;
 }
 
-bool HookingLayer::IsHookIntalled(const std::string_view& name)
+bool HookingLayer::IsHookIntalled(const std::string_view& name) const
 {
 	return hooks.contains(name);
 }
