@@ -1,4 +1,4 @@
-Setting up boilerplate on every new project gets old fast, so this toolkit exists to let you skip it and work directly with the game’s own renderer from the start.
+Setting up boilerplate on every new project gets old fast, so this toolkit exists to help you skip it and work directly with the game’s own renderer from the start.
 
 ## What You Need First
 This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following for your target game:
@@ -157,7 +157,9 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
         app.SetGLSLVersion("#version 330 core");
 #endif
 
+		//registers backend specific hooks (EndScene for DirectX9 and so on...)
         app.RegisterBackEndHooks();
+		//registers several windows api hooks
         app.RegisterUniversalHooks();
 
 		//example for registering your own hook. (detour not implemented in this example)
