@@ -179,7 +179,7 @@ void App::EndFrame() const
 	dxDevice->OMSetRenderTargets(1, &dxMainRenderTargetView, nullptr);
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
 #elifdef DirectX11
-	dxContext->OMSetRenderTargets(1, &dxMainRenderTargetView, NULL);
+	dxContext->OMSetRenderTargets(1, &dxMainRenderTargetView, nullptr);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());

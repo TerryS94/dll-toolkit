@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX10
+#define DirectX9
 
 #ifndef NOMINMAX
 #define NOMINMAX

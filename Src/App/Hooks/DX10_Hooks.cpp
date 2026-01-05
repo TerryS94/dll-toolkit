@@ -7,15 +7,15 @@ namespace ProvidedDetours
 	{
         if (!firstEverInit)
         {
-            if (SUCCEEDED(app.dxSwapChain->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice)))
+            if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice)))
             {
                 firstEverInit = true;
                 app.UpdateDirectXDeviceVTable();
                 DXGI_SWAP_CHAIN_DESC desc;
-                app.dxSwapChain->GetDesc(&desc);
+                pSwapChain->GetDesc(&desc);
                 app.Update_HWND(desc.OutputWindow);
                 ID3D10Texture2D* pBackBuffer = nullptr;
-                app.dxSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBackBuffer);
+                pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBackBuffer);
                 if (pBackBuffer)
                 {
                     app.dxDevice->CreateRenderTargetView(pBackBuffer, NULL, &app.dxMainRenderTargetView);
