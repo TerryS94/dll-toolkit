@@ -37,21 +37,19 @@ namespace ProvidedDetours
 		HRESULT result = app.GetOriginalFunction<tDX9_EndScene>("EndScene")(pD3D9);
 		return result;
 	}
-#pragma optimize("", off)
-	__declspec(naked) HRESULT __stdcall Present_Detour([[maybe_unused]] IDirect3DSwapChain9* swapChain, [[maybe_unused]] const RECT* pSourceRect, [[maybe_unused]] const RECT* pDestRect, [[maybe_unused]] HWND hDestWindowOverride, [[maybe_unused]] const RGNDATA* pDirtyRegion, [[maybe_unused]] DWORD dwFlags) noexcept
+	HRESULT __stdcall Present_Detour(IDirect3DSwapChain9* swapChain, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion, DWORD dwFlags)
 	{
-		__asm sub esp, __LOCAL_SIZE
-		tDX9_Present originalPresent;
-		originalPresent = app.GetOriginalFunction<tDX9_Present>("Present");
-
 		//optionally, you can hide all your imgui rendering from game capturing software with this function.
 		//Example: if some condition is false, you could render your imgui in EndScene.. otherwise you could render in here undetected.
 		//Tip: you do not need to hot reload imgui and all your resources etc. itll just work when toggling back and forth between EndScene and Present :)
+		//Side note: doesn't work when the capture software hooks Present (like discord for example) but works for Medal.tv and OBS.
+		//i have not tested other capture software but i suspect itll work for most other capture software.
 
-		__asm add esp, __LOCAL_SIZE
-		__asm jmp originalPresent
+		//app.Call_UserRenderFunction();
+
+		HRESULT result = app.GetOriginalFunction<tDX9_Present>("Present")(swapChain, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
+		return result;
 	}
-#pragma optimize("", on)
 	HRESULT __stdcall DrawIndexedPrimitive_Detour(IDirect3DDevice9* pD3D9, D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
 	{
 		HRESULT result = app.GetOriginalFunction<tDX9_DrawIndexedPrimitive>("DrawIndexedPrimitive")(pD3D9, Type, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);

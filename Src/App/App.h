@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX11
+#define DirectX9
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -80,7 +80,7 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #define DX9_BeginScene_Addr            app.GetDirectXDeviceMethodByIndex(41)
 #define DX9_EndScene_Addr              app.GetDirectXDeviceMethodByIndex(42)
 #define DX9_DrawIndexedPrimitive_Addr  app.GetDirectXDeviceMethodByIndex(82)
-#define DX9_Present_Addr               ((char*)(app.GetDirectXSwapChainMethodByIndex(3)) + 5)
+#define DX9_Present_Addr               app.GetDirectXSwapChainMethodByIndex(3)
 #elifdef DirectX10
 #define DX10_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
 #define DX10_ResizeBuffers_Addr        app.GetDirectXSwapChainMethodByIndex(13)

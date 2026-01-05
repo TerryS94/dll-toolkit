@@ -12,6 +12,6 @@ namespace ProvidedDetours
 	HRESULT __stdcall Reset_Detour(IDirect3DDevice9* pD3D9, D3DPRESENT_PARAMETERS* pPresentationParameters);
 	HRESULT __stdcall BeginScene_Detour(IDirect3DDevice9* pDevice);
 	HRESULT __stdcall EndScene_Detour(IDirect3DDevice9* pD3D9);
-	HRESULT __stdcall Present_Detour([[maybe_unused]] IDirect3DSwapChain9* swapChain, [[maybe_unused]] const RECT* pSourceRect, [[maybe_unused]] const RECT* pDestRect, [[maybe_unused]] HWND hDestWindowOverride, [[maybe_unused]] const RGNDATA* pDirtyRegion, [[maybe_unused]] DWORD dwFlags) noexcept;
+	HRESULT __stdcall Present_Detour(IDirect3DSwapChain9* swapChain, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion, DWORD dwFlags);
 	HRESULT __stdcall DrawIndexedPrimitive_Detour(IDirect3DDevice9* pD3D9, D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount);
 }
