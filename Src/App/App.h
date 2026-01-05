@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define OpenGL2
+#define DirectX9
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -302,37 +302,36 @@ public:
 	NODISCARD bool IsHookIntalled(const std::string_view& name) const;
 };
 
-static thread_local int g_allowMouseWarpDepth = 0;
-struct AllowMouseWarpScope
-{
-	AllowMouseWarpScope() { ++g_allowMouseWarpDepth; }
-	~AllowMouseWarpScope() { --g_allowMouseWarpDepth; }
-};
-
 struct MouseStateSnapshot
 {
 private:
-	POINT savedPos {};
-	RECT savedClip {};
-	bool havePos = false;
-	bool haveClip = false;
+	inline static thread_local int g_allowMouseWarpDepth = 0;
+	POINT savedPos{};
+	RECT savedClip{};
+	bool havePos = false, haveClip = false;
 public:
+	MouseStateSnapshot() noexcept = default;
+	~MouseStateSnapshot() noexcept = default;
 	inline void MouseStateSnapshot_OnMenuOpened()
 	{
 		havePos = (GetCursorPos(&savedPos) != 0);
 		haveClip = (GetClipCursor(&savedClip) != 0);
 		ClipCursor(nullptr);
 	}
-
 	inline void MouseStateSnapshot_OnMenuClosed() const
 	{
 		if (haveClip) ClipCursor(&savedClip);
 		if (havePos)
 		{
-			AllowMouseWarpScope scope;
+			++g_allowMouseWarpDepth;
 			SetCursorPos(savedPos.x, savedPos.y);
+			--g_allowMouseWarpDepth;
 		}
 	}
+	//for back-end mouse stuff. ignore this.
+	NODISCARD inline bool AllowMouseWarpNow() const noexcept { return g_allowMouseWarpDepth > 0; }
+	MouseStateSnapshot(const MouseStateSnapshot&) = delete;
+	MouseStateSnapshot& operator=(const MouseStateSnapshot&) = delete;
 };
 
 class App : public HookingLayer, public MouseStateSnapshot
@@ -479,8 +478,6 @@ public:
 	NODISCARD inline const std::string_view& Get_TargetWindowClassName() const { return targetWindowClassName; }
 	//get the current target window title name the user specified on inject with Set_targetWindowInfo
 	NODISCARD inline const std::string_view& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
-	//for back-end mouse stuff. ignore this.
-	NODISCARD inline bool AllowMouseWarpNow() { return g_allowMouseWarpDepth > 0; }
 	//Automatically create hooks for CreateWindowExA, NtUserDestroyWindow, GetCursorPos, NtUserSetCursorPos and DeviceIoControl; maybe more will be added in the future.
 	//These can be used for any backend, hence "Universal". Doesn't include WndProc because that's already handled in the Init etc.
 	//Note: this will not install the hooks. Only registers them. you will need to do app.InstallHooks() after registering these and the rest of your hooks, if any!
