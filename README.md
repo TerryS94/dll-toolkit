@@ -128,7 +128,11 @@ void MainRender()
         app.ToggleMenu(!app.IsMenuOpen());
 
 	//input/cursor blocking to the target window and cursor restoration is handled automatically :)
-    const bool want_mouse_this_frame = app.IsMenuOpen() || app.IsFreeMouseCursorActive();// || other custom logic you may want here
+    const bool isMenuOpen = app.IsMenuOpen();
+	const bool hasFreeCursor = app.IsFreeMouseCursorActive();
+	const bool hasMouseAtAll = isMenuOpen || hasFreeCursor;
+	const bool want_mouse_this_frame = hasMouseAtAll;// || other custom logic you may want here
+
     app.BeginFrame(want_mouse_this_frame);
 
     DrawStuff();
