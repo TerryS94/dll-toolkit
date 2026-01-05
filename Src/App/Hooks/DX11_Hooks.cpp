@@ -32,8 +32,24 @@ namespace ProvidedDetours
 		HRESULT result = app.GetOriginalFunction<tDX11_Present>("Present")(pSwapChain, SyncInterval, Flags);
 		return result;
 	}
-	void __stdcall DrawIndexedPrimitive_Detour(ID3D11DeviceContext* pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation)
-	{
-		app.GetOriginalFunction<tDX11_DrawIndexedPrimitive>("DrawIndexedPrimitive")(pContext, IndexCount, StartIndexLocation, BaseVertexLocation);
-	}
+    HRESULT __stdcall ResizeBuffers_Detour(IDXGISwapChain* pSC, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+    {
+        if (!pSC) return E_INVALIDARG;
+        if (app.dxContext) { ID3D11RenderTargetView* nullRTV[1] = { nullptr }; app.dxContext->OMSetRenderTargets(1, nullRTV, nullptr); app.dxContext->Flush(); }
+        if (app.dxMainRenderTargetView) { app.dxMainRenderTargetView->Release(); app.dxMainRenderTargetView = nullptr; }
+        HRESULT hr = app.GetOriginalFunction<tDX11_ResizeBuffers>("ResizeBuffers")(pSC, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+        if (FAILED(hr)) return hr;
+        DXGI_SWAP_CHAIN_DESC desc{};
+        if (SUCCEEDED(pSC->GetDesc(&desc))) app.Update_HWND(desc.OutputWindow);
+        if (!app.dxDevice) pSC->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice);
+        ID3D11Texture2D* pBack = nullptr;
+        hr = pSC->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBack);
+        if (FAILED(hr) || !pBack) return hr;
+        hr = app.dxDevice->CreateRenderTargetView(pBack, nullptr, &app.dxMainRenderTargetView);
+        pBack->Release();
+        if (FAILED(hr)) return hr;
+        if (app.dxContext) app.dxContext->OMSetRenderTargets(1, &app.dxMainRenderTargetView, nullptr);
+        app.UpdateDirectXSwapChain(pSC);
+        return S_OK;
+    }
 }

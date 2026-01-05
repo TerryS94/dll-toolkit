@@ -73,7 +73,7 @@ namespace ProvidedDetours
 
 	BOOL WINAPI GetCursorPos_Detour(LPPOINT point)
 	{
-#ifndef AnyOpenGLActive //opengl doesnt seem to like this trick, nor need it so check for just that.
+#ifndef AnyOpenGLActive //opengl doesnt seem to like this trick but doesn't seem like it's needed anyways.
 		static POINT lastCursorPos{};
 		if (app.HasMouseCursor())
 		{

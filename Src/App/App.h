@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX9
+#define DirectX11
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -83,8 +83,10 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #define DX9_Present_Addr               ((char*)(app.GetDirectXSwapChainMethodByIndex(3)) + 5)
 #elifdef DirectX10
 #define DX10_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
+#define DX10_ResizeBuffers_Addr        app.GetDirectXSwapChainMethodByIndex(13)
 #elifdef DirectX11					   
 #define DX11_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
+#define DX11_ResizeBuffers_Addr        app.GetDirectXSwapChainMethodByIndex(13)
 #elifdef DirectX12
 //todo
 #elifdef AnyOpenGLActive			   
@@ -347,7 +349,6 @@ private:
 	bool wantFreeCursor = false;
 	std::function<void()> userInitResources;
 	std::function<void()> userRenderFunc;
-
 #ifdef AnyOpenGLActive
 	ULONGLONG reloadTickCount = 0ull;
 #endif
@@ -480,7 +481,7 @@ public:
 	//or if you're building for OpenGL then itll register SwapBuffers etc for you.
 	//just simply call this function before you invoke InstallHooks()
 	void RegisterBackEndHooks();
-	//do we have a cursor given to us by ImGui?
+	//do we have a mouse cursor given to us by ImGui?
 	[[nodiscard]] bool HasMouseCursor() const { return hasMouseCursor; }
 	//if you need a mouse cursor without having to open the main menu (for just wanting to move HUD around for example)
 	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
@@ -488,7 +489,7 @@ public:
 	[[nodiscard]] inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
 	//set your InitResources function pointer here so that way the hooking side of things is handled automatically.
 	inline void Set_InitResourcesFunc(std::function<void()> initResources) { userInitResources = std::move(initResources); };
-	//set your "OnRender" function pointer here so that way it can be called in the hooks automatically.
+	//set your "OnRender" function pointer here so that way it can be called in the appropriate hook automatically.
 	inline void Set_UserRenderFunc(std::function<void()> MainRender) { userRenderFunc = std::move(MainRender); };
 	//For hooks etc to call automatically. You can ignore this.
 	//Will call the user's InitResources function which App is made aware of by the user defining it on inject with the Set_InitResourcesFunc function

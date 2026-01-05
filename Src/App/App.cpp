@@ -239,18 +239,20 @@ void App::RegisterUniversalHooks()
 void App::RegisterBackEndHooks()
 {
 #ifdef DirectX9
-	app.RegisterHook("BeginScene",           (uint64_t)DX9_BeginScene_Addr,           (uint64_t)ProvidedDetours::BeginScene_Detour);
-	app.RegisterHook("EndScene",             (uint64_t)DX9_EndScene_Addr,             (uint64_t)ProvidedDetours::EndScene_Detour);
-	app.RegisterHook("DrawIndexedPrimitive", (uint64_t)DX9_DrawIndexedPrimitive_Addr, (uint64_t)ProvidedDetours::DrawIndexedPrimitive_Detour);
-	app.RegisterHook("Reset",                (uint64_t)DX9_Reset_Addr,                (uint64_t)ProvidedDetours::Reset_Detour);
-	app.RegisterHook("Present",              (uint64_t)DX9_Present_Addr,              (uint64_t)ProvidedDetours::Present_Detour);
-#elifdef DirectX10
-	app.RegisterHook("Present",              (uint64_t)DX10_Present_Addr,             (uint64_t)ProvidedDetours::Present_Detour);
-#elifdef DirectX11
-	app.RegisterHook("Present",              (uint64_t)DX11_Present_Addr,             (uint64_t)ProvidedDetours::Present_Detour);
-#elifdef AnyOpenGLActive
-	app.RegisterHook("wglMakeCurrent",       (uint64_t)OpenGL_wglMakeCurrent_Addr,    (uint64_t)ProvidedDetours::wglMakeCurrent_Detour);
-	app.RegisterHook("SwapBuffers",          (uint64_t)OpenGL_SwapBuffers_Addr,       (uint64_t)ProvidedDetours::SwapBuffers_Detour);
+	app.RegisterHook("BeginScene",           (uint64_t)DX9_BeginScene_Addr,            (uint64_t)ProvidedDetours::BeginScene_Detour);
+	app.RegisterHook("EndScene",             (uint64_t)DX9_EndScene_Addr,              (uint64_t)ProvidedDetours::EndScene_Detour);
+	app.RegisterHook("DrawIndexedPrimitive", (uint64_t)DX9_DrawIndexedPrimitive_Addr,  (uint64_t)ProvidedDetours::DrawIndexedPrimitive_Detour);
+	app.RegisterHook("Reset",                (uint64_t)DX9_Reset_Addr,                 (uint64_t)ProvidedDetours::Reset_Detour);
+	app.RegisterHook("Present",              (uint64_t)DX9_Present_Addr,               (uint64_t)ProvidedDetours::Present_Detour);
+#elifdef DirectX10																	   
+	app.RegisterHook("Present",              (uint64_t)DX10_Present_Addr,              (uint64_t)ProvidedDetours::Present_Detour);
+	app.RegisterHook("ResizeBuffers",        (uint64_t)DX10_ResizeBuffers_Addr,        (uint64_t)ProvidedDetours::ResizeBuffers_Detour);
+#elifdef DirectX11																	   
+	app.RegisterHook("Present",              (uint64_t)DX11_Present_Addr,              (uint64_t)ProvidedDetours::Present_Detour);
+	app.RegisterHook("ResizeBuffers",        (uint64_t)DX11_ResizeBuffers_Addr,        (uint64_t)ProvidedDetours::ResizeBuffers_Detour);
+#elifdef AnyOpenGLActive															   
+	app.RegisterHook("wglMakeCurrent",       (uint64_t)OpenGL_wglMakeCurrent_Addr,     (uint64_t)ProvidedDetours::wglMakeCurrent_Detour);
+	app.RegisterHook("SwapBuffers",          (uint64_t)OpenGL_SwapBuffers_Addr,        (uint64_t)ProvidedDetours::SwapBuffers_Detour);
 #endif
 }
 
