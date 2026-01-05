@@ -176,6 +176,7 @@ void App::EndFrame() const
 #ifdef DirectX9
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 #elifdef DirectX10
+	dxDevice->OMSetRenderTargets(1, &dxMainRenderTargetView, nullptr);
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
 #elifdef DirectX11
 	dxContext->OMSetRenderTargets(1, &dxMainRenderTargetView, NULL);
