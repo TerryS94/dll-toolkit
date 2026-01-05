@@ -142,14 +142,17 @@ DWORD WINAPI MainThread(MAYBEUNUSED LPVOID lpParameter)
 
 #ifdef DirectX9
         auto* device = GetGameDevicePtr();
+		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
         app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4'
         app.UpdateDirectXDevice(device); 
 #elifdef DirectX11
         app.Update_HWND(GetWindowHandle());
+		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
 		app.Set_TargetWindowInfo("game window title", "window class name");
 		//dx device and context are derived from the swapchain
         app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//example for BO2 Plutonium version
 #elifdef AnyOpenGLActive
+		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
         app.Set_TargetWindowInfo("MX Bikes", "Core Window Class");//example for the game 'MX Bikes'
         app.SetGLSLVersion("#version 330 core");
 #endif
