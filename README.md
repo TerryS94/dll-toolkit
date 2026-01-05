@@ -1,4 +1,4 @@
-Setting up boilerplate on every new project gets old fast, so this toolkit exists to help you skip it and work directly with the game’s own renderer from the start.
+Setting up boilerplate on every new project gets old fast, so this toolkit exists to help you skip that and work directly with the game’s own renderer from the start.
 
 ## What You Need First
 This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following for your target game:
@@ -119,11 +119,14 @@ void MainRender()
     if (!app.IsRendererActive())
 		return;
 
+	//give yourself a free cursor without needing to open your whole menu (for moving HUD around)
 	if (app.IsKeyPressed(AppKeys::KEY_F3))
     	app.ToggleFreeMouseCursor(!app.IsFreeMouseCursorActive());
+	//opens your menu
     if (app.IsKeyPressed(AppKeys::KEY_F4))
         app.ToggleMenu(!app.IsMenuOpen());
 
+	//input/cursor blocking to the target window and cursor restoration is handled automatically :)
     const bool want_mouse_this_frame = app.IsMenuOpen() || app.IsFreeMouseCursorActive();// || other custom logic you may want here
     app.BeginFrame(want_mouse_this_frame);
 
