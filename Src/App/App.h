@@ -57,13 +57,6 @@ static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #endif
 
-#ifndef NODISCARD
-#define NODISCARD [[nodiscard]]
-#endif
-#ifndef MAYBEUNUSED
-#define MAYBEUNUSED [[maybe_unused]]
-#endif
-
 #if ( (defined DirectX9   ? 1 : 0) + \
       (defined DirectX10  ? 1 : 0) + \
       (defined DirectX11  ? 1 : 0) + \
@@ -293,13 +286,13 @@ public:
 	//uninstall all registered hooks
 	void UninstallHooks();
 	//returns a pointer to a location in memory using a pattern. Leave param 'module' empty to scan the current process by default.
-	NODISCARD BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module = "");
+	[[nodiscard]] BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module = "");
 	//in case you have something in another thread that needs to wait for this task to be done
-	NODISCARD inline bool AreHooksInstalled() const { return hooks_applied; }
+	[[nodiscard]] inline bool AreHooksInstalled() const { return hooks_applied; }
 	//in case you have something in another thread that needs to wait for this task to be done
-	NODISCARD inline bool ArePatchesInstalled() const { return patches_applied; }
+	[[nodiscard]] inline bool ArePatchesInstalled() const { return patches_applied; }
 	//check if a specific hook has been installed by name
-	NODISCARD bool IsHookIntalled(const std::string_view& name) const;
+	[[nodiscard]] bool IsHookIntalled(const std::string_view& name) const;
 };
 
 struct MouseStateSnapshot
@@ -329,7 +322,7 @@ public:
 		}
 	}
 	//for back-end mouse stuff. ignore this.
-	NODISCARD inline bool AllowMouseWarpNow() const noexcept { return g_allowMouseWarpDepth > 0; }
+	[[nodiscard]] inline bool AllowMouseWarpNow() const noexcept { return g_allowMouseWarpDepth > 0; }
 	MouseStateSnapshot(const MouseStateSnapshot&) = delete;
 	MouseStateSnapshot& operator=(const MouseStateSnapshot&) = delete;
 };
@@ -361,20 +354,20 @@ private:
 
 private:
 #ifdef DirectX9
-	PDIRECT3DTEXTURE9 DX9_LoadTextureFromFile(const char* filename) const;
-	PDIRECT3DTEXTURE9 DX9_LoadTextureFromMemory(void* data, size_t size) const;
+	[[nodiscard]] IDirect3DTexture9* DX9_LoadTextureFromFile(const char* filename) const;
+	[[nodiscard]] IDirect3DTexture9* DX9_LoadTextureFromMemory(void* data, size_t size) const;
 #elifdef DirectX10
-	ID3D10ShaderResourceView* DX10_LoadTextureFromFile(const char* filename) const;
-	ID3D10ShaderResourceView* DX10_LoadTextureFromMemory(void* data, size_t size) const;
+	[[nodiscard]] ID3D10ShaderResourceView* DX10_LoadTextureFromFile(const char* filename) const;
+	[[nodiscard]] ID3D10ShaderResourceView* DX10_LoadTextureFromMemory(void* data, size_t size) const;
 #elifdef DirectX11
-	ID3D11ShaderResourceView* DX11_LoadTextureFromFile(const char* filename) const;
-	ID3D11ShaderResourceView* DX11_LoadTextureFromMemory(void* data, size_t size) const;
+	[[nodiscard]] ID3D11ShaderResourceView* DX11_LoadTextureFromFile(const char* filename) const;
+	[[nodiscard]] ID3D11ShaderResourceView* DX11_LoadTextureFromMemory(void* data, size_t size) const;
 //#elifdef DirectX12
-//	ID3D12Resource* DX12_LoadTextureFromFile(const char* filename);
-//	ID3D12Resource* DX12_LoadTextureFromMemory(void* data, size_t size, int knownWidth = 0, int knownHeight = 0) const;
+//	[[nodiscard]] ID3D12Resource* DX12_LoadTextureFromFile(const char* filename);
+//	[[nodiscard]] ID3D12Resource* DX12_LoadTextureFromMemory(void* data, size_t size, int knownWidth = 0, int knownHeight = 0) const;
 #elifdef AnyOpenGLActive
-	GLTexture GL_LoadTextureFromFile(const char* filename);
-	GLTexture GL_LoadTextureFromMemory(void* data, size_t size);
+	[[nodiscard]] GLTexture GL_LoadTextureFromFile(const char* filename);
+	[[nodiscard]] GLTexture GL_LoadTextureFromMemory(void* data, size_t size);
 #endif
 
 #ifdef AnyOpenGLActive
@@ -409,17 +402,17 @@ public:
 	//high jack the target WndProc. handled by backend, but can be called manually if you need to in specific scenarios.
 	void Override_WndProc();
 	//returns the original WndProc (For backend use. Can ignore this)
-	NODISCARD inline WNDPROC Get_Original_WndProc() const { return original_WndProc; }
+	[[nodiscard]] inline WNDPROC Get_Original_WndProc() const { return original_WndProc; }
 	//set this in dllmain just before jumping to your main thread!
 	inline void Set_DLLHandle(HMODULE mod) { dllHandle = mod; };
 	//use this as first arg to FreeLibraryAndExitThread for ejecting (make sure to do Set_DLLHandle in dllmain!
-	NODISCARD inline HMODULE Get_DLLHandle() const { return dllHandle; }
+	[[nodiscard]] inline HMODULE Get_DLLHandle() const { return dllHandle; }
 	//whether or not ImGui is initialized
-	NODISCARD inline bool IsRendererActive() const { return isRendererActive; }
+	[[nodiscard]] inline bool IsRendererActive() const { return isRendererActive; }
 	//set whether or not ImGui should be considered active (BeginFrame/EndFrame shouldn't be reachable if this is false!)
 	inline void Set_RendererActive(bool active) { isRendererActive = active; }
 	//has ImGui been initialized for the very first time
-	NODISCARD inline bool HasInitializedFirstTime() const { return imguiFirstInitDone; }
+	[[nodiscard]] inline bool HasInitializedFirstTime() const { return imguiFirstInitDone; }
 	//notify that on the next frame we would like to reload ImGui
 	inline void Set_ImGui_Reload(bool need_reload)
 	{ 
@@ -432,7 +425,7 @@ public:
 		} 
 		needImGuiReload = need_reload; }
 	//check this every frame and when it's true, reload ImGui
-	NODISCARD inline bool Need_ImGui_Reload() const
+	[[nodiscard]] inline bool Need_ImGui_Reload() const
 	{
 #ifdef AnyOpenGLActive
 		return needImGuiReload && GetTickCount64() > reloadTickCount;
@@ -443,16 +436,16 @@ public:
 	//update the internal hwnd that App is aware of
 	inline void Update_HWND(HWND hwnd) { this->hwnd = hwnd; }
 	//key press event only (use provided AppKeys enum or you can cast an integer to AppKeys for the same effect as "VK_X")
-	NODISCARD bool IsKeyPressed(AppKeys key_code) const;
+	[[nodiscard]] bool IsKeyPressed(AppKeys key_code) const;
     //checks if 'key1' is held while 'key2' is pressed only.
     //if a 3rd key is passed in, then it checks if both 'key1' and 'key2' are held while 'key3' is pressed only.
-	NODISCARD bool IsKeyChordPressed(AppKeys key1, AppKeys key2, AppKeys key3 = AppKeys::INVALID) const;
+	[[nodiscard]] bool IsKeyChordPressed(AppKeys key1, AppKeys key2, AppKeys key3 = AppKeys::INVALID) const;
 	//key down event only (use provided AppKeys enum or you can cast an integer to AppKeys for the same effect as "VK_X")
-	NODISCARD bool IsKeyDown(AppKeys key_code) const;
+	[[nodiscard]] bool IsKeyDown(AppKeys key_code) const;
 	//is target window in focus
-	NODISCARD inline bool IsTargetWindowFocused() const { return this->isTargetWindowFocused; };
+	[[nodiscard]] inline bool IsTargetWindowFocused() const { return this->isTargetWindowFocused; };
 	//return the current hwnd that our App is aware of right now
-	NODISCARD inline HWND GetHWND() const { return this->hwnd; };
+	[[nodiscard]] inline HWND GetHWND() const { return this->hwnd; };
 	//a wrapper for ImGui_X_InvalidateDeviceObjects/ImGui_X_DestroyDeviceObjects
 	void ImGui_InvalidateDeviceObjects() const;
 	//a wrapper for ImGui_X_CreateDeviceObjects
@@ -462,22 +455,22 @@ public:
 	//on inject you can set this one time if you want to 'HIGH_PRIORITY_CLASS' for example
 	inline void Set_PriorityClass(DWORD dwPriorityClass) const { SetPriorityClass(GetCurrentProcess(), dwPriorityClass); };
 	//a helper function that automatically checks if the HMODULE is valid first so we can avoid the "GetModuleHandle(x) could be 0" intellisense error.
-	NODISCARD inline FARPROC Get_ProcAddress(const char* mod, const char* function) { HMODULE m = GetModuleHandle(mod); if (!m) return nullptr; return GetProcAddress(m, function); }
+	[[nodiscard]] inline FARPROC Get_ProcAddress(const char* mod, const char* function) { HMODULE m = GetModuleHandle(mod); if (!m) return nullptr; return GetProcAddress(m, function); }
 	//are we in the process of unloading our dll?
-	NODISCARD inline bool IsEjecting() const { return isEjectingDLL; }
+	[[nodiscard]] inline bool IsEjecting() const { return isEjectingDLL; }
 	//make this the first thing you call when you flag your dll to eject so that certain sections unload properly in Shutdown
 	//because Shutdown is also called for reloading ImGui
 	inline void SignalEject() { this->Set_RendererActive(false); isEjectingDLL = true; }
 	//toggle your main tool overlay on/off
 	inline void ToggleMenu(bool open) { isMenuOpen = open; if (!isMenuOpen) wantFreeCursor = false; }
 	//is our tool overlay open/visible?
-	NODISCARD inline bool IsMenuOpen() const { return isMenuOpen; }
+	[[nodiscard]] inline bool IsMenuOpen() const { return isMenuOpen; }
 	//make App aware of the target window titlename and classname you're workin with
 	inline void Set_TargetWindowInfo(const std::string_view& title_name, const std::string_view& class_name) { this->targetWindowTitleName = title_name; this->targetWindowClassName = class_name; }
 	//get the current target window classname the user specified on inject with Set_targetWindowInfo
-	NODISCARD inline const std::string_view& Get_TargetWindowClassName() const { return targetWindowClassName; }
+	[[nodiscard]] inline const std::string_view& Get_TargetWindowClassName() const { return targetWindowClassName; }
 	//get the current target window title name the user specified on inject with Set_targetWindowInfo
-	NODISCARD inline const std::string_view& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
+	[[nodiscard]] inline const std::string_view& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
 	//Automatically create hooks for CreateWindowExA, NtUserDestroyWindow, GetCursorPos, NtUserSetCursorPos and DeviceIoControl; maybe more will be added in the future.
 	//These can be used for any backend, hence "Universal". Doesn't include WndProc because that's already handled in the Init etc.
 	//Note: this will not install the hooks. Only registers them. you will need to do app.InstallHooks() after registering these and the rest of your hooks, if any!
@@ -488,7 +481,7 @@ public:
 	//just simply call this function before you invoke InstallHooks()
 	void RegisterBackEndHooks();
 	//do we have a cursor given to us by ImGui?
-	NODISCARD bool HasMouseCursor() const { return hasMouseCursor; }
+	[[nodiscard]] bool HasMouseCursor() const { return hasMouseCursor; }
 	//if you need a mouse cursor without having to open the main menu (for just wanting to move HUD around for example)
 	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
 	//do we currently have a free cursor? (a cursor given to us without the need of the main menu being open)
@@ -508,14 +501,14 @@ public:
 	//register a font from a file
 	void AddFontFromFile(const std::string_view& fontName, const std::string_view& path, float initialFontSize);
 	//get a pointer to any font by name that was registered via AddFontFromMemory/AddFontFromFile
-	NODISCARD ImFont* GetFontByName(const std::string_view& fontName);
+	[[nodiscard]] ImFont* GetFontByName(const std::string_view& fontName);
 
 	//a wrapper that loads a texture from a file regardless of the desired provided backend renderer
 	void AddTextureFromFile(const std::string_view& name, const std::string_view& path);
 	//a wrapper that loads a texture from memory regardless of the desired provided backend renderer
 	void AddTextureFromMemory(const std::string_view& name, void* data, const size_t data_size);
 	//get a pointer to any texture by name that was loaded via AddTextureFromMemory/AddTextureFromFile
-	NODISCARD CustomTexture* GetTextureByName(const std::string_view& textureName);
+	[[nodiscard]] CustomTexture* GetTextureByName(const std::string_view& textureName);
 
 #ifdef AnyDirectXActive
 private:
@@ -524,8 +517,8 @@ private:
 public:
 	void UpdateDirectXDeviceVTable();
 	void UpdateDirectXSwapChainVTable();
-	NODISCARD void* GetDirectXDeviceMethodByIndex(int index) const;
-	NODISCARD void* GetDirectXSwapChainMethodByIndex(int index) const;
+	[[nodiscard]] void* GetDirectXDeviceMethodByIndex(int index) const;
+	[[nodiscard]] void* GetDirectXSwapChainMethodByIndex(int index) const;
 #endif
 
 public: //public because its easier to use them in the hooks because using a getter would cause leaks
@@ -553,7 +546,7 @@ public:
 	//after inject, initialize this once time somewhere. example string would be "#version 330 core"
 	inline void SetGLSLVersion(const char* version) { glsl_version = version; }
 	//returns a string of the known GLSL version that was provided by the user
-	NODISCARD inline const char* GetGLSLVersion() { return glsl_version; }
+	[[nodiscard]] inline const char* GetGLSLVersion() { return glsl_version; }
 #endif
 };
 extern App app;

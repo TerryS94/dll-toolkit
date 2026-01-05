@@ -537,7 +537,7 @@ void* App::GetDirectXContextMethodByIndex(int index) const
 #endif
 
 #ifdef DirectX9
-PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename) const
+IDirect3DTexture9* App::DX9_LoadTextureFromFile(const char* filename) const
 {
 	PDIRECT3DTEXTURE9 baseTexture = nullptr;
 	HRESULT hr = D3DXCreateTextureFromFileExA(dxDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &baseTexture);
@@ -548,9 +548,9 @@ PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromFile(const char* filename) const
 	}
 	return baseTexture;
 }
-PDIRECT3DTEXTURE9 App::DX9_LoadTextureFromMemory(void* data, size_t size) const
+IDirect3DTexture9* App::DX9_LoadTextureFromMemory(void* data, size_t size) const
 {
-	PDIRECT3DTEXTURE9 texture = nullptr;
+	IDirect3DTexture9* texture = nullptr;
 	HRESULT result = D3DXCreateTextureFromFileInMemoryEx(dxDevice, data, size, D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, nullptr, nullptr, &texture);
 	if (result != S_OK)
 		return nullptr;

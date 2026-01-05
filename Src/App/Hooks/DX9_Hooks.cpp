@@ -38,7 +38,7 @@ namespace ProvidedDetours
 		return result;
 	}
 #pragma optimize("", off)
-	__declspec(naked) HRESULT __stdcall Present_Detour(MAYBEUNUSED IDirect3DSwapChain9* swapChain, MAYBEUNUSED const RECT* pSourceRect, MAYBEUNUSED const RECT* pDestRect, MAYBEUNUSED HWND hDestWindowOverride, MAYBEUNUSED const RGNDATA* pDirtyRegion, MAYBEUNUSED DWORD dwFlags) noexcept
+	__declspec(naked) HRESULT __stdcall Present_Detour([[maybe_unused]] IDirect3DSwapChain9* swapChain, [[maybe_unused]] const RECT* pSourceRect, [[maybe_unused]] const RECT* pDestRect, [[maybe_unused]] HWND hDestWindowOverride, [[maybe_unused]] const RGNDATA* pDirtyRegion, [[maybe_unused]] DWORD dwFlags) noexcept
 	{
 		__asm sub esp, __LOCAL_SIZE
 		tDX9_Present originalPresent;
