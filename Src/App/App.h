@@ -372,7 +372,7 @@ private:
 
 #ifdef AnyOpenGLActive
 	void GL_DestroyTexture(GLTexture& t);
-	bool GL_CreateTextureRGBA8(const unsigned char* rgba, int w, int h, GLTexture& out);
+	[[nodiscard]] bool GL_CreateTextureRGBA8(const unsigned char* rgba, int w, int h, GLTexture& out);
 #endif
 
 	void FreeTextures();
@@ -450,7 +450,7 @@ public:
 	void ImGui_InvalidateDeviceObjects() const;
 	//a wrapper for ImGui_X_CreateDeviceObjects
 	void ImGui_CreateDeviceObjects() const;
-	//free any fonts or textures we allocated after init
+	//clean up any fonts or textures
 	void FreeResources();
 	//on inject you can set this one time if you want to 'HIGH_PRIORITY_CLASS' for example
 	inline void Set_PriorityClass(DWORD dwPriorityClass) const { SetPriorityClass(GetCurrentProcess(), dwPriorityClass); };
@@ -485,7 +485,7 @@ public:
 	//if you need a mouse cursor without having to open the main menu (for just wanting to move HUD around for example)
 	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
 	//do we currently have a free cursor? (a cursor given to us without the need of the main menu being open)
-	inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
+	[[nodiscard]] inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
 	//set your InitResources function pointer here so that way the hooking side of things is handled automatically.
 	inline void Set_InitResourcesFunc(std::function<void()> initResources) { userInitResources = std::move(initResources); };
 	//set your "OnRender" function pointer here so that way it can be called in the hooks automatically.
@@ -536,7 +536,7 @@ public: //public because its easier to use them in the hooks because using a get
 	ID3D11DeviceContext* dxContext = nullptr;
 	void** dxContextVTable = nullptr;
 	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
-	void* GetDirectXContextMethodByIndex(int index) const;
+	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
 	void UpdateDirectXContextVTable();
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
 #elifdef AnyOpenGLActive
