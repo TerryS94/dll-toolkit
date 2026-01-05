@@ -523,18 +523,29 @@ public:
 
 public: //public because its easier to use them in the hooks because using a getter would cause leaks
 #ifdef DirectX9
+	//for back-end use. prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
 	IDirect3DDevice9* dxDevice = nullptr;
+	//use this function to update the device pointer, it will also update vtable.
 	void UpdateDirectXDevice(IDirect3DDevice9* device);
 #elifdef DirectX10
+	//for back-end use. You can ignore this.
 	ID3D10Device* dxDevice = nullptr;
+	//for back-end use. prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
+	//for back-end use. You can ignore this.
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
 #elifdef DirectX11
+	//for back-end use. You can ignore this.
 	ID3D11Device* dxDevice = nullptr;
+	//for back-end use. prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
+	//for back-end use. You can ignore this.
 	ID3D11DeviceContext* dxContext = nullptr;
+private:
 	void** dxContextVTable = nullptr;
+public:
+	//for back-end use. You can ignore this.
 	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
 	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
 	void UpdateDirectXContextVTable();
