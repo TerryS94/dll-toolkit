@@ -4,6 +4,7 @@ Setting up boilerplate on every new project gets old fast, so this toolkit exist
 This dll toolkit does not create its own backend instances. Instead, it expects you to provide one of the following for your target game:
 - DirectX9: the game’s ```IDirect3DDevice9*```. Everything else is derived from that device.
 - DirectX10/11: the game’s ```IDXGISwapChain*```. Everything else is derived from that swapchain.
+- OpenGL2: nothing required.
 - OpenGL3: the GLSL version string (e.g. ```"#version 330 core"```) that ImGui needs at init.
 
 This lets the toolkit run on the game’s real renderer rather than a local dummy, so visuals, device state, and input match the game exactly.
