@@ -16,6 +16,12 @@ This may sound overkill if you only plan to make the simplest overlay, but if yo
 - Add the **App** folder into your dll project.
 - Also Pull ImGui into your project. (Leave its folder structure in tact)
 
+```
+git clone https://github.com/TerryS94/dll-toolkit.git
+cd dll-toolkit
+git submodule update --init --remote --recursive
+```
+
 ## Notes
 This project uses the vcpkg package manager for a couple static dependencies, such as:
 - **STB** header file (For loading textures from file/memory for backends that are not DX9)
