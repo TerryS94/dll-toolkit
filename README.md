@@ -12,15 +12,14 @@ This lets the toolkit run on the game’s real renderer rather than a local dumm
 This may sound overkill if you only plan to make the simplest overlay, but if you know basic reverse engineering, providing the required field is usually quick.
 
 ## Project Setup
-- Add the **DirectX9** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
-- Add the **App** folder into your dll project.
-- Also Pull ImGui into your project. (Leave its folder structure in tact)
-
 ```
 git clone https://github.com/TerryS94/dll-toolkit.git
 cd dll-toolkit
 git submodule update --init --remote --recursive
 ```
+- Add the **DirectX9** folder into your dll project. (DX9 isn't officially supported on Windows so that's why we need it)
+- Add the **App** folder into your dll project.
+- Also Pull ImGui into your project. (Leave its folder structure in tact)
 
 ## Notes
 This project uses the vcpkg package manager for a couple static dependencies, such as:
