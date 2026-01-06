@@ -526,13 +526,16 @@ public:
 	[[nodiscard]] void* GetDirectXSwapChainMethodByIndex(int index) const;
 #endif
 
-public: //public because its easier to use them in the hooks because using a getter would cause leaks
+public: //public because its easier to use them in the hooks because using a setter/getter would cause leaks
 #ifdef DirectX9
 	//[Internal] don't use! Prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
 	IDirect3DDevice9* dxDevice = nullptr;
 	//use this function to update the device pointer, it will also update vtable.
 	void UpdateDirectXDevice(IDirect3DDevice9* device);
 #elifdef DirectX10
+private:
+	void UpdateDirectXDevice();
+public:
 	//[Internal] don't use unless you know what you're doing!
 	ID3D10Device* dxDevice = nullptr;
 	//[Internal] don't use! Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
@@ -541,11 +544,12 @@ public: //public because its easier to use them in the hooks because using a get
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
-	//derive the device from the swapchain and update the device vtable too
-	void UpdateDirectXDevice();
 #elifdef DirectX11
 private:
 	void** dxContextVTable = nullptr;
+	void UpdateDirectXContextVTable();
+	void UpdateDirectXContext();
+	void UpdateDirectXDevice();
 public:
 	//[Internal] don't use directly!
 	ID3D11Device* dxDevice = nullptr;
@@ -557,14 +561,8 @@ public:
 	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
 	//unused at the moment.
 	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
-	//Internally called in Present hook after the context is known/set.
-	void UpdateDirectXContextVTable();
-	//derive the context from the device and update the context vtable too
-	void UpdateDirectXContext();
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
-	//derive the device from the swapchain and update the device vtable too
-	void UpdateDirectXDevice();
 #elifdef AnyOpenGLActive
 private:
 	const char* glsl_version = nullptr;
