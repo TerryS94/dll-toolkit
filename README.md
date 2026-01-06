@@ -62,7 +62,8 @@ void MainRender()
             app.InitRenderer();
             app.Call_UserInitResources();
         }
-#elif defined DirectX10 || defined DirectX11 //Present function will first derive the device and rendertargetview and hwnd etc then we can finally init
+//Present function will first derive the desired outputwindow (hwnd) and mainRenderTargetView then our MainRender is called
+#elif defined DirectX10 || defined DirectX11
         calledInitFirstTime = true;
         app.InitRenderer();
         app.Call_UserInitResources();
