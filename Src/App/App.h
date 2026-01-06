@@ -515,22 +515,23 @@ public:
 private:
 	void** dxDeviceVTable = nullptr;
 	void** dxSwapChainVTable = nullptr;
-public:
-	//called automatically when you assign/update the device via UpdateDirectXDevice.
 	void UpdateDirectXDeviceVTable();
-	//called automatically when you assign/update the device via UpdateDirectXDevice.
 	void UpdateDirectXSwapChainVTable();
-	//you can use directly you want but check out the macros if you don't know which indexes to use. Example, DX9_EndScene_Addr already gives you GetDirectXSwapChainMethodByIndex(42).
+public:
+	//you can use directly if you want but check out the macros if you don't know which indexes to use.
+	//Example, DX9_EndScene_Addr already gives you GetDirectXSwapChainMethodByIndex(42).
 	[[nodiscard]] void* GetDirectXDeviceMethodByIndex(int index) const;
-	//you can use directly you want but check out the macros if you don't know which indexes to use. Example, DX9_Present_Addr already gives you GetDirectXSwapChainMethodByIndex(3).
+	//you can use directly if you want but check out the macros if you don't know which indexes to use.
+	//Example, DX9_Present_Addr already gives you GetDirectXSwapChainMethodByIndex(3).
 	[[nodiscard]] void* GetDirectXSwapChainMethodByIndex(int index) const;
 #endif
 
-public: //public because its easier to use them in the hooks because using a setter/getter would cause leaks
+public: //public because its easier to use some of this stuff in hooks
 #ifdef DirectX9
-	//[Internal] don't use! Prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
+	//[Internal] don't use unless you know what you're doing!
+	//Prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
 	IDirect3DDevice9* dxDevice = nullptr;
-	//use this function to update the device pointer, it will also update vtable.
+	//use this function to update the device pointer, it will also update swap chain and all vtables.
 	void UpdateDirectXDevice(IDirect3DDevice9* device);
 #elifdef DirectX10
 private:
@@ -551,7 +552,7 @@ private:
 	void UpdateDirectXContext();
 	void UpdateDirectXDevice();
 public:
-	//[Internal] don't use directly!
+	//[Internal] don't use unless you know what you're doing!
 	ID3D11Device* dxDevice = nullptr;
 	//[Internal] don't use. Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
