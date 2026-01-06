@@ -541,6 +541,11 @@ void App::UpdateDirectXDevice()
 #if defined DirectX11
 void App::UpdateDirectXContext()
 {
+	if (!dxDevice)
+	{
+		MessageBox(nullptr, "Device was invalid!", "Called from UpdateDirectXContext", MB_OK);
+		ExitProcess(EXIT_FAILURE);
+	}
 	dxDevice->GetImmediateContext(&app.dxContext);
 	UpdateDirectXContextVTable();
 }
