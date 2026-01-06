@@ -153,7 +153,7 @@ DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
 		app.Set_TargetWindowInfo("game window title", "window class name");
 		//dx device and context are derived from the swapchain
         app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//example for BO2 Plutonium version
-#elifdef AnyOpenGLActive
+#elifdef OpenGL3
 		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
         app.Set_TargetWindowInfo("MX Bikes", "Core Window Class");//example for the game 'MX Bikes'
         app.SetGLSLVersion("#version 330 core");
