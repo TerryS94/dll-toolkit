@@ -1,7 +1,8 @@
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui.git
+	branch = master
 [submodule "DirectX9"]
 	path = DirectX9
 	url = https://github.com/TerryS94/DirectX9.git
-	branch = main
+	branch = master
