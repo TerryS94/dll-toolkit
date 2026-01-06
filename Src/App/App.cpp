@@ -461,7 +461,6 @@ void App::UpdateDirectXDeviceVTable()
 		return;
 	}
 	dxDeviceVTable = *reinterpret_cast<void***>(dxDevice);
-	UpdateDirectXSwapChainVTable();
 }
 void App::UpdateDirectXSwapChainVTable()
 {
@@ -501,11 +500,12 @@ void App::UpdateDirectXDevice(IDirect3DDevice9* device)
 #elifdef DirectX11
 void App::UpdateDirectXContextVTable()
 {
-	dxDevice->GetImmediateContext(&dxContext);
-	if (dxContext)
-		dxContextVTable = *reinterpret_cast<void***>(dxContext);
-	else
-		MessageBox(nullptr, "Couldn't obtain the DirectX11 immediate context", "DX Error", MB_OK | MB_ICONERROR);
+	if (!dxContext)
+	{
+		MessageBox(nullptr, "DirectX11 context was invalid", "Called from UpdateDirectXContextVTable", MB_OK | MB_ICONERROR);
+		ExitProcess(EXIT_FAILURE);
+	}
+	dxContextVTable = *reinterpret_cast<void***>(dxContext);
 }
 #endif
 
@@ -518,6 +518,39 @@ void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
 	if (dxSwapChain) dxSwapChain->Release();
 	dxSwapChain = newSwap;
 	UpdateDirectXSwapChainVTable();
+}
+#endif
+
+#if defined DirectX10
+void App::UpdateDirectXDevice(ID3D10Device* device)
+{
+	ID3D10Device* newDevice = device;
+	if (newDevice == dxDevice) return;
+	if (newDevice) newDevice->AddRef();
+	if (dxDevice) dxDevice->Release();
+	dxDevice = newDevice;
+	UpdateDirectXDeviceVTable();
+}
+#endif
+
+#if defined DirectX11
+void App::UpdateDirectXContext(ID3D11DeviceContext* context)
+{
+	ID3D11DeviceContext* newContext = context;
+	if (newContext == dxContext) return;
+	if (newContext) newContext->AddRef();
+	if (dxContext) dxContext->Release();
+	dxContext = newContext;
+	UpdateDirectXContextVTable();
+}
+void App::UpdateDirectXDevice(ID3D11Device* device)
+{
+	ID3D11Device* newDevice = device;
+	if (newDevice == dxDevice) return;
+	if (newDevice) newDevice->AddRef();
+	if (dxDevice) dxDevice->Release();
+	dxDevice = newDevice;
+	UpdateDirectXDeviceVTable();
 }
 #endif
 

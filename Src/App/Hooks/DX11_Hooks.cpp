@@ -7,10 +7,14 @@ namespace ProvidedDetours
 	{
         if (!firstEverInit)
         {
-            if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice)))
+            //if user supplied the device pointer up front (for hooking device specific vtable functions) then use that value.
+            //otherwise, derive it from swapchain :)
+            if (app.dxDevice || SUCCEEDED(pSwapChain->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice)))
             {
                 firstEverInit = true;
                 app.UpdateDirectXDeviceVTable();
+                //if the user didn't supply context on inject (for hooking context vtable function for example), then finally set it here.
+                if (!app.dxContext) app.dxDevice->GetImmediateContext(&app.dxContext);
                 app.UpdateDirectXContextVTable();
                 DXGI_SWAP_CHAIN_DESC desc;
                 pSwapChain->GetDesc(&desc);

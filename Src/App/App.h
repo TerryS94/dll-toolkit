@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX9
+#define DirectX10
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -65,7 +65,7 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #error "You must define exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3!"
 #endif
 
-#if defined(DirectX9) && !defined(BUILD_x86)
+#if defined DirectX9 && !defined BUILD_x86
 #error "If you use DirectX9, you must also build as x86!"
 #endif
 
@@ -516,41 +516,58 @@ private:
 	void** dxDeviceVTable = nullptr;
 	void** dxSwapChainVTable = nullptr;
 public:
+	//called automatically when you assign/update the device via UpdateDirectXDevice.
 	void UpdateDirectXDeviceVTable();
+	//called automatically when you assign/update the device via UpdateDirectXDevice.
 	void UpdateDirectXSwapChainVTable();
+	//you can use directly you want but check out the macros if you don't know which indexes to use. Example, DX9_EndScene_Addr already gives you GetDirectXSwapChainMethodByIndex(42).
 	[[nodiscard]] void* GetDirectXDeviceMethodByIndex(int index) const;
+	//you can use directly you want but check out the macros if you don't know which indexes to use. Example, DX9_Present_Addr already gives you GetDirectXSwapChainMethodByIndex(3).
 	[[nodiscard]] void* GetDirectXSwapChainMethodByIndex(int index) const;
 #endif
 
 public: //public because its easier to use them in the hooks because using a getter would cause leaks
 #ifdef DirectX9
-	//for back-end use. prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
+	//[Internal] don't use! Prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
 	IDirect3DDevice9* dxDevice = nullptr;
 	//use this function to update the device pointer, it will also update vtable.
 	void UpdateDirectXDevice(IDirect3DDevice9* device);
 #elifdef DirectX10
-	//for back-end use. You can ignore this.
+	//[Internal] don't use unless you know what you're doing!
 	ID3D10Device* dxDevice = nullptr;
-	//for back-end use. prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
+	//[Internal] don't use! Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
-	//for back-end use. You can ignore this.
+	//[Internal] don't use. It's handled automatically for you already.
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
+	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
+	//if you want to hook any functions in the device vtable, you will need to supply the game's device pointer up front before any hooks are installed!
+	//if you don't care about hooking any device vtable functions, then device will automatically be derived from the swapchain later in Present hook and you can ignore this.
+	void UpdateDirectXDevice(ID3D10Device* device);
 #elifdef DirectX11
-	//for back-end use. You can ignore this.
-	ID3D11Device* dxDevice = nullptr;
-	//for back-end use. prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
-	IDXGISwapChain* dxSwapChain = nullptr;
-	//for back-end use. You can ignore this.
-	ID3D11DeviceContext* dxContext = nullptr;
 private:
 	void** dxContextVTable = nullptr;
 public:
-	//for back-end use. You can ignore this.
+	//[Internal] don't use directly!
+	ID3D11Device* dxDevice = nullptr;
+	//[Internal] don't use. Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
+	IDXGISwapChain* dxSwapChain = nullptr;
+	//[Internal] don't use unless you know what you're doing!
+	ID3D11DeviceContext* dxContext = nullptr;
+	//[Internal] don't use. It's handled automatically for you already.
 	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
+	//unused at the moment.
 	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
+	//Internally called in Present hook after the context is known/set.
 	void UpdateDirectXContextVTable();
+	//if you want to hook any functions in the context vtable, you will need to supply the game's context pointer up front before any hooks are installed!
+	//if you don't care about hooking any context vtable functions, then context will automatically be derived from the device later in Present hook.
+	void UpdateDirectXContext(ID3D11DeviceContext* context);
+	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
+	//if you want to hook any functions in the device vtable, you will need to supply the game's device pointer up front before any hooks are installed!
+	//if you don't care about hooking any device vtable functions, then device will automatically be derived from the swapchain later in Present hook and you can ignore this.
+	void UpdateDirectXDevice(ID3D11Device* device);
 #elifdef AnyOpenGLActive
 private:
 	const char* glsl_version = nullptr;
