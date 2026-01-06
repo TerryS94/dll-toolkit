@@ -518,39 +518,31 @@ void App::UpdateDirectXSwapChain(IDXGISwapChain* swapChain)
 	if (dxSwapChain) dxSwapChain->Release();
 	dxSwapChain = newSwap;
 	UpdateDirectXSwapChainVTable();
+	UpdateDirectXDevice();
+#ifdef DirectX11
+	UpdateDirectXContext();
+#endif
 }
 #endif
 
-#if defined DirectX10
-void App::UpdateDirectXDevice(ID3D10Device* device)
+#if defined DirectX10 || defined DirectX11
+void App::UpdateDirectXDevice()
 {
-	ID3D10Device* newDevice = device;
-	if (newDevice == dxDevice) return;
-	if (newDevice) newDevice->AddRef();
-	if (dxDevice) dxDevice->Release();
-	dxDevice = newDevice;
-	UpdateDirectXDeviceVTable();
+	if (SUCCEEDED(dxSwapChain->GetDevice(__uuidof(dxDevice), (void**)&dxDevice)))
+		UpdateDirectXDeviceVTable();
+	else
+	{
+		MessageBox(nullptr, "Couldn't grab the device!", "Called from UpdateDirectXDevice", MB_OK);
+		ExitProcess(EXIT_FAILURE);
+	}
 }
 #endif
 
 #if defined DirectX11
-void App::UpdateDirectXContext(ID3D11DeviceContext* context)
+void App::UpdateDirectXContext()
 {
-	ID3D11DeviceContext* newContext = context;
-	if (newContext == dxContext) return;
-	if (newContext) newContext->AddRef();
-	if (dxContext) dxContext->Release();
-	dxContext = newContext;
+	dxDevice->GetImmediateContext(&app.dxContext);
 	UpdateDirectXContextVTable();
-}
-void App::UpdateDirectXDevice(ID3D11Device* device)
-{
-	ID3D11Device* newDevice = device;
-	if (newDevice == dxDevice) return;
-	if (newDevice) newDevice->AddRef();
-	if (dxDevice) dxDevice->Release();
-	dxDevice = newDevice;
-	UpdateDirectXDeviceVTable();
 }
 #endif
 

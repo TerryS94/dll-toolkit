@@ -7,11 +7,9 @@ namespace ProvidedDetours
 	{
         if (!firstEverInit)
         {
-            if (app.dxDevice || SUCCEEDED(pSwapChain->GetDevice(__uuidof(app.dxDevice), (void**)&app.dxDevice)))
+            if (app.dxDevice)
             {
                 firstEverInit = true;
-                app.UpdateDirectXDeviceVTable();
-                app.UpdateDirectXSwapChainVTable();
                 DXGI_SWAP_CHAIN_DESC desc;
                 pSwapChain->GetDesc(&desc);
                 app.Update_HWND(desc.OutputWindow);

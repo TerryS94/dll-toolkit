@@ -5,7 +5,7 @@
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
 //must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX10
+#define DirectX11
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -541,9 +541,8 @@ public: //public because its easier to use them in the hooks because using a get
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
-	//if you want to hook any functions in the device vtable, you will need to supply the game's device pointer up front before any hooks are installed!
-	//if you don't care about hooking any device vtable functions, then device will automatically be derived from the swapchain later in Present hook and you can ignore this.
-	void UpdateDirectXDevice(ID3D10Device* device);
+	//derive the device from the swapchain and update the device vtable too
+	void UpdateDirectXDevice();
 #elifdef DirectX11
 private:
 	void** dxContextVTable = nullptr;
@@ -560,14 +559,12 @@ public:
 	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
 	//Internally called in Present hook after the context is known/set.
 	void UpdateDirectXContextVTable();
-	//if you want to hook any functions in the context vtable, you will need to supply the game's context pointer up front before any hooks are installed!
-	//if you don't care about hooking any context vtable functions, then context will automatically be derived from the device later in Present hook.
-	void UpdateDirectXContext(ID3D11DeviceContext* context);
+	//derive the context from the device and update the context vtable too
+	void UpdateDirectXContext();
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you as well.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
-	//if you want to hook any functions in the device vtable, you will need to supply the game's device pointer up front before any hooks are installed!
-	//if you don't care about hooking any device vtable functions, then device will automatically be derived from the swapchain later in Present hook and you can ignore this.
-	void UpdateDirectXDevice(ID3D11Device* device);
+	//derive the device from the swapchain and update the device vtable too
+	void UpdateDirectXDevice();
 #elifdef AnyOpenGLActive
 private:
 	const char* glsl_version = nullptr;
