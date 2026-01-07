@@ -82,14 +82,12 @@ void MainRender()
     //triggers when changing the window resolution or some other event that requires a hard reload
     if (app.Need_ImGui_Reload())
     {
-#ifdef AnyDirectXActive
+#ifdef DirectX9
         if (HWND hwnd = GetGameWindowHandle())
         {
             app.Set_RendererActive(false);
             app.Set_ImGui_Reload(false);
-#ifdef DirectX9
             app.UpdateDirectXDevice(GetGameDevicePtr());
-#endif
             app.Update_HWND(hwnd);
             app.ReloadRenderer();
             InitResources();
