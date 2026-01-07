@@ -1,3 +1,5 @@
+//This file is part of the dll-tookit by TerryS94 -> https://github.com/TerryS94/dll-toolkit
+
 #pragma once
 
 //comment/uncomment this line to toggle EnableDpiAwareness in our imgui init
@@ -23,38 +25,22 @@
 #include <memory>
 #include <atomic>
 
-#if defined(_WIN64)     || defined(__amd64__) || defined(__amd64) \
- || defined(__x86_64__) || defined(_M_X64)     || defined(_M_AMD64) \
- || defined(__aarch64__) || defined(_M_ARM64)
+#if defined _WIN64     || defined __amd64__ || defined __amd64   \
+ || defined __x86_64__ || defined _M_X64     || defined _M_AMD64 \
+ || defined __aarch64__ || defined _M_ARM64
 #ifndef BUILD_x64
 #define BUILD_x64
 #endif
 #endif
 
-#if defined(_M_IX86) || defined(__i386__)
+#if defined _M_IX86 || defined __i386__
 #ifndef BUILD_x86
 #define BUILD_x86
 #endif
 #endif
 
-#if defined(BUILD_x64) && defined(BUILD_x86)
+#if defined BUILD_x64 && defined BUILD_x86
 #error "Conflicting build defines: both BUILD_x64 and BUILD_x86 are defined"
-#endif
-
-#if defined(BUILD_x64)
-#define POINTER_SIZE 8
-#elif defined(BUILD_x86)
-#define POINTER_SIZE 4
-#elif defined(__SIZEOF_POINTER__)
-#define POINTER_SIZE __SIZEOF_POINTER__
-#else
-#define POINTER_SIZE (sizeof(void*))
-#endif
-
-#if defined(__cplusplus)
-static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
-#else
-_Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #endif
 
 #if ( (defined DirectX9   ? 1 : 0) + \
@@ -69,13 +55,13 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #error "If you use DirectX9, you must also build as x86!"
 #endif
 
-#if defined DirectX9 || defined DirectX10 || defined DirectX11 || defined DirectX12
+#if defined DirectX9 || defined DirectX10 || defined DirectX11
 #define AnyDirectXActive
-#elif defined(OpenGL2) || defined(OpenGL3)
+#elif defined OpenGL2 || defined OpenGL3
 #define AnyOpenGLActive
 #endif
 
-#if defined DirectX9
+#ifdef DirectX9
 #define DX9_Reset_Addr                 app.GetDirectXDeviceMethodByIndex(16)
 #define DX9_BeginScene_Addr            app.GetDirectXDeviceMethodByIndex(41)
 #define DX9_EndScene_Addr              app.GetDirectXDeviceMethodByIndex(42)
@@ -87,8 +73,6 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #elifdef DirectX11					   
 #define DX11_Present_Addr              app.GetDirectXSwapChainMethodByIndex(8)
 #define DX11_ResizeBuffers_Addr        app.GetDirectXSwapChainMethodByIndex(13)
-#elifdef DirectX12
-//todo
 #elifdef AnyOpenGLActive			   
 #define OpenGL_wglMakeCurrent_Addr     app.Get_ProcAddress("opengl32.dll",   "wglMakeCurrent")					     
 #define OpenGL_SwapBuffers_Addr        app.Get_ProcAddress("gdi32.dll",      "SwapBuffers")
@@ -103,7 +87,6 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #define NtUserSetCursorPos_Addr        app.Get_ProcAddress("win32u.dll",     "NtUserSetCursorPos")
 #define DeviceIoControl_Addr           app.Get_ProcAddress("kernelbase.dll", "DeviceIoControl")
 
-//pull imgui from github into your project folder and keep the imgui folder structure however it comes then the following imgui includes should work without issues.
 #define _USE_MATH_DEFINES
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -122,26 +105,33 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
 #include "backends/imgui_impl_dx9.h"
+#include "App/Hooks/DX9_Hooks.h"
 #elif defined DirectX10
 #include <d3d10_1.h>
 #include "backends/imgui_impl_dx10.h"
+#include "App/Hooks/DX10_Hooks.h"
 #elif defined DirectX11
 #include <d3d11.h>
 #pragma comment(lib, "d3d11.lib")
 #include "backends/imgui_impl_dx11.h"
-#elif defined DirectX12 //DirectX12 not supported yet and may not ever be
-#include "backends/imgui_impl_dx12.h"
-#include <d3d12.h>
-#include <dxgi1_5.h>
+#include "App/Hooks/DX11_Hooks.h"
+//#elif defined DirectX12
+//#include "backends/imgui_impl_dx12.h"
+//#include <d3d12.h>
+//#include <dxgi1_5.h>
+//#pragma comment(lib, "dxgi.lib")
+//#pragma comment(lib, "d3d12.lib")
 #elif defined OpenGL2
 #pragma comment(lib, "opengl32.lib")
 #include "backends/imgui_impl_opengl2.h"
 #include <GL/gl.h>
+#include "App/Hooks/OpenGL_Hooks.h"
 #elif defined OpenGL3
 #pragma comment(lib, "opengl32.lib")
 #include "backends/imgui_impl_opengl3_loader.h"
 #include "backends/imgui_impl_opengl3.h"
 #include <GL/gl.h>
+#include "App/Hooks/OpenGL_Hooks.h"
 #ifndef GL_RGBA8
 #define GL_RGBA8 0x8058
 #endif
@@ -153,16 +143,6 @@ _Static_assert((POINTER_SIZE == sizeof(void*)), "pointer size mismatch");
 #include "polyhook2/Detour/x86Detour.hpp"
 #elifdef BUILD_x64
 #include "polyhook2/Detour/x64Detour.hpp"
-#endif
-
-#ifdef DirectX9
-#include "App/Hooks/DX9_Hooks.h"
-#elifdef DirectX10
-#include "App/Hooks/DX10_Hooks.h"
-#elifdef DirectX11
-#include "App/Hooks/DX11_Hooks.h"
-#elifdef AnyOpenGLActive
-#include "App/Hooks/OpenGL_Hooks.h"
 #endif
 
 //hooks that are installable regardless of the renderer

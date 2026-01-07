@@ -1,3 +1,5 @@
+//This file is part of the dll-tookit by TerryS94 -> https://github.com/TerryS94/dll-toolkit
+
 #pragma once
 #include "App/App.h"
 

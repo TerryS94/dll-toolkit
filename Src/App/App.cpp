@@ -1,3 +1,5 @@
+//This file is part of the dll-tookit by TerryS94 -> https://github.com/TerryS94/dll-toolkit
+
 #include "App.h"
 
 //only utilizing stb lib if its not DX9
@@ -25,6 +27,8 @@
 #elifdef DirectX11
 #include "backends/imgui_impl_dx11.cpp"
 #include "Hooks/DX11_Hooks.cpp"
+//#elifdef DirectX12
+//#include "backends/imgui_impl_dx12.cpp"
 #elifdef OpenGL2
 #include "backends/imgui_impl_opengl2.cpp"
 #include "Hooks/OpenGL_Hooks.cpp"
@@ -122,6 +126,8 @@ void App::Shutdown()
 	ImGui_ImplDX10_Shutdown();
 #elifdef DirectX11
 	ImGui_ImplDX11_Shutdown();
+//#elifdef DirectX12
+//	ImGui_ImplDX12_Shutdown();
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_Shutdown();
 #elifdef OpenGL3
@@ -158,6 +164,8 @@ void App::BeginFrame(bool want_mouse_this_frame)
 	ImGui_ImplDX10_NewFrame();
 #elifdef DirectX11
 	ImGui_ImplDX11_NewFrame();
+//#elifdef DirectX12
+//	ImGui_ImplDX12_NewFrame();
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_NewFrame();
 #elifdef OpenGL3
@@ -181,6 +189,8 @@ void App::EndFrame() const
 #elifdef DirectX11
 	dxContext->OMSetRenderTargets(1, &dxMainRenderTargetView, nullptr);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+//#elifdef DirectX12
+//	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommandList);
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 #elifdef OpenGL3
@@ -196,6 +206,8 @@ void App::ImGui_InvalidateDeviceObjects() const
 	ImGui_ImplDX10_InvalidateDeviceObjects();
 #elifdef DirectX11
 	ImGui_ImplDX11_InvalidateDeviceObjects();
+//#elifdef DirectX12
+//	ImGui_ImplDX12_InvalidateDeviceObjects();
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_DestroyDeviceObjects();
 #elifdef OpenGL3
@@ -211,6 +223,8 @@ void App::ImGui_CreateDeviceObjects() const
 	ImGui_ImplDX10_CreateDeviceObjects();
 #elifdef DirectX11
 	ImGui_ImplDX11_CreateDeviceObjects();
+//#elifdef DirectX12
+//	ImGui_ImplDX12_CreateDeviceObjects();
 #elifdef OpenGL2
 	ImGui_ImplOpenGL2_CreateDeviceObjects();
 #elifdef OpenGL3
@@ -250,6 +264,7 @@ void App::RegisterBackEndHooks()
 #elifdef DirectX11																	   
 	app.RegisterHook("Present",              (uint64_t)DX11_Present_Addr,              (uint64_t)ProvidedDetours::Present_Detour);
 	app.RegisterHook("ResizeBuffers",        (uint64_t)DX11_ResizeBuffers_Addr,        (uint64_t)ProvidedDetours::ResizeBuffers_Detour);
+//#elifdef DirectX12
 #elifdef AnyOpenGLActive															   
 	app.RegisterHook("wglMakeCurrent",       (uint64_t)OpenGL_wglMakeCurrent_Addr,     (uint64_t)ProvidedDetours::wglMakeCurrent_Detour);
 	app.RegisterHook("SwapBuffers",          (uint64_t)OpenGL_SwapBuffers_Addr,        (uint64_t)ProvidedDetours::SwapBuffers_Detour);
@@ -376,7 +391,7 @@ void App::AddTextureFromFile(const std::string_view& name, const std::string_vie
 #elifdef DirectX11
 	tex->ptr = DX11_LoadTextureFromFile(path.data());
 	if (!tex->ptr) { MessageBox(nullptr, std::format("DX11: failed to load texture \"{}\"", path).data(), "F", MB_OK); return; }
-//#elif defined(DirectX12)
+//#elifdef DirectX12
 //		tex->ptr = DX12_LoadTextureFromFile(path.data());
 //		if (!tex->ptr) { MessageBox(nullptr, std::format("DX12: failed to load texture \"{}\"", path).data(), "F", MB_OK); return; }
 #elifdef AnyOpenGLActive
@@ -550,7 +565,6 @@ void App::UpdateDirectXContext()
 	UpdateDirectXContextVTable();
 }
 #endif
-
 	
 #if defined AnyDirectXActive
 void* App::GetDirectXDeviceMethodByIndex(int index) const

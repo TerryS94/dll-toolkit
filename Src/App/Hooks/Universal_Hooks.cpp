@@ -1,3 +1,5 @@
+//This file is part of the dll-tookit by TerryS94 -> https://github.com/TerryS94/dll-toolkit
+
 #include "Universal_Hooks.h"
 
 //ready-to-go hooks that will work regardless of the backend/renderer hence "Universal"
