@@ -77,9 +77,9 @@ void MainRender()
         app.Call_UserInitResources();
 #endif
     }
+
+#if defined DirectX9 || defined AnyOpenGLActive
     //triggers when changing the window resolution or some other event that requires a hard reload
-	//if using DX10/DX11 then pretty sure you don't even need this scope at all from what i've gathered.
-	//because of ResizeBuffers hook for those backends
     if (app.Need_ImGui_Reload())
     {
 #ifdef AnyDirectXActive
@@ -100,6 +100,7 @@ void MainRender()
         InitResources();
 #endif
     }
+#endif
     
     if (!app.IsRendererActive())
 		return;
