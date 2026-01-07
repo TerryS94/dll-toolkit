@@ -34,14 +34,11 @@ vcpkg install stb:x86-windows-static stb:x64-windows-static
 vcpkg install polyhook2:x86-windows-static polyhook2:x64-windows-static
 ```
 
-# Example Usage
-### Here is a simple dllmain.cpp sample you can achieve with this toolkit in it's current state
-- even less code if this example only focused on a single game :)
-
+## Example Usage
+<details>
+<summary>CLICK HERE to see an example dllmain.cpp</summary>
+	
 ```cpp
-//the flow of things may evolve with time... but even already
-//you can see how simple it is to get somethin goin :)
-
 //inside this App header at the top you can mess with the configuration (which backend you want etc)
 #include "App/App.h"
 
@@ -144,30 +141,27 @@ DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
 {
 	{
 		app.Set_PriorityClass(HIGH_PRIORITY_CLASS); //optional
-		//pass your InitResources to App so it can call it where it needs to in the provided hooks
-		app.Set_InitResourcesFunc(InitResources);//toolkit can now automatically call your init resources in certain hooks
-		app.Set_UserRenderFunc(MainRender);//toolkit can now automatically call your render function where it needs to.
+		//pass your InitResources to App class so it can call it where it needs to in the provided hooks
+		app.Set_InitResourcesFunc(InitResources);
+		//the toolkit can now automatically call your render function where it needs to.
+		app.Set_UserRenderFunc(MainRender);
 
 #ifdef DirectX9
-        auto* device = GetGameDevicePtr();
-		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
         app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4'
-        app.UpdateDirectXDevice(device); 
-#elifdef DirectX11
-        app.Update_HWND(GetWindowHandle());
-		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
-		app.Set_TargetWindowInfo("game window title", "window class name");
+        app.UpdateDirectXDevice(GetGameDevicePtr()); 
+#elif defined DirectX10 || defined DirectX11
+		app.Set_TargetWindowInfo("game window title", "game window class name");
 		//dx device and context are derived from the swapchain
-        app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//example for BO2 Plutonium version
+        app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//the games swapchain address
+#elifdef OpenGL2
+		app.Set_TargetWindowInfo("game window title", "game window class name");
 #elifdef OpenGL3
-		//a setter for both window title and classname for CreateWindowExA hook to handle reloading renderer
         app.Set_TargetWindowInfo("MX Bikes", "Core Window Class");//example for the game 'MX Bikes'
         app.SetGLSLVersion("#version 330 core");
 #endif
-
 		//registers backend specific hooks (EndScene for DirectX9 and so on...)
         app.RegisterBackEndHooks();
-		//registers several windows api hooks
+		//registers several windows api hooks that the backend will make use of.
         app.RegisterUniversalHooks();
 
 		//example for registering your own hook. (detour not implemented in this example)
@@ -187,6 +181,7 @@ DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
         while (true)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			//eject our dll if this key combo is pressed
             if (app.IsKeyChordPressed(AppKeys::LEFT_SHIFT, AppKeys::DEL))
             {
                 //flag to the Shutdown call that we want to tear down EVERYTHING
@@ -195,7 +190,7 @@ DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
                 break;
             }
         }
-        app.Shutdown();
+        app.Shutdown();//will fully shutdown since SignalEject was called above.
 	}
     FreeLibraryAndExitThread(app.Get_DLLHandle(), 0);
 }
@@ -203,9 +198,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, [[maybe_unused]
 {
     if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
+		//make App class aware of what dll to eject later
 		app.Set_DLLHandle(hModule);
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, NULL);
     }
     return TRUE;
 }
 ```
+</details>
+
+## Contributing
+
+Contributions of all kinds are welcome! Whether it's bug fixes, optimizations, new features, additional backends, or documentation improvements, your help makes the project better.  
+
+If you submit a pull request, please try to match the existing code style and structure. Keeping things consistent makes it easier for everyone to read, review, and maintain the code.
