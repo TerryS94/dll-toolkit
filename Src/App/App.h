@@ -2,12 +2,12 @@
 
 #pragma once
 
+//must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
+#define DirectX9
 //comment/uncomment this line to toggle EnableDpiAwareness in our imgui init
 #define ImGui_EnableDpiAwareness
 //comment/uncomment this line to toggle #include "imgui_demo.cpp"
 #define ImGui_IncludeDemo
-//must be set to exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3
-#define DirectX9
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -15,6 +15,7 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+
 #include <Windows.h>
 #include <functional>
 #include <filesystem>
@@ -28,26 +29,22 @@
 #if defined _WIN64     || defined __amd64__ || defined __amd64   \
  || defined __x86_64__ || defined _M_X64     || defined _M_AMD64 \
  || defined __aarch64__ || defined _M_ARM64
-#ifndef BUILD_x64
 #define BUILD_x64
-#endif
 #endif
 
 #if defined _M_IX86 || defined __i386__
-#ifndef BUILD_x86
 #define BUILD_x86
-#endif
 #endif
 
 #if defined BUILD_x64 && defined BUILD_x86
 #error "Conflicting build defines: both BUILD_x64 and BUILD_x86 are defined"
 #endif
 
-#if ( (defined DirectX9   ? 1 : 0) + \
-      (defined DirectX10  ? 1 : 0) + \
-      (defined DirectX11  ? 1 : 0) + \
-      (defined OpenGL2    ? 1 : 0) + \
-      (defined OpenGL3    ? 1 : 0) ) != 1
+#if ( (defined DirectX9  ? 1 : 0) + \
+      (defined DirectX10 ? 1 : 0) + \
+      (defined DirectX11 ? 1 : 0) + \
+      (defined OpenGL2   ? 1 : 0) + \
+      (defined OpenGL3   ? 1 : 0) ) != 1
 #error "You must define exactly one of DirectX9, DirectX10, DirectX11, OpenGL2, OpenGL3!"
 #endif
 
@@ -188,14 +185,12 @@ struct CustomTexture
 		if (ptr) { ptr->Release(); ptr = nullptr; }
 #endif
 	}
-
-	//can add more fields here that are not dependent on the backend (size for example)
 };
 
 //virtual keycodes but in enum form so its a lot nicer to use and find stuff
 enum class AppKeys : int
 {
-	INVALID = -1, LBUTTON = 0x01, RBUTTON = 0x02, CANCEL = 0x03, MIDDLEMOUSE = 0x04, MOUSE4 = 0x05, MOUSE5 = 0x06, BACK = 0x08, TAB = 0x09, CLEAR = 0x0C, RETURN = 0x0D, SHIFT = 0x10,
+	INVALID = 0x0, LBUTTON = 0x01, RBUTTON = 0x02, CANCEL = 0x03, MIDDLEMOUSE = 0x04, MOUSE4 = 0x05, MOUSE5 = 0x06, BACK = 0x08, TAB = 0x09, CLEAR = 0x0C, RETURN = 0x0D, SHIFT = 0x10,
 	CTRL = 0x11, ALT = 0x12, PAUSE = 0x13, CAPSLOCK = 0x14, ESCAPE = 0x1B, CONVERT = 0x1C, NONCONVERT = 0x1D, ACCEPT = 0x1E, MODECHANGE = 0x1F, SPACE = 0x20, PAGEUP = 0x21, PAGEDOWN = 0x22,
 	END = 0x23, HOME = 0x24, LEFT = 0x25, UP_ARROW = 0x26, RIGHT_ARROW = 0x27, DOWN_ARROW = 0x28, SELECT = 0x29, PRINT = 0x2A, EXECUTE = 0x2B, PRINTSCREEN = 0x2C, INSERT = 0x2D, DEL = 0x2E,
 	HELP = 0x2F, KEY_0 = 0x30, KEY_1 = 0x31, KEY_2 = 0x32, KEY_3 = 0x33, KEY_4 = 0x34, KEY_5 = 0x35, KEY_6 = 0x36, KEY_7 = 0x37, KEY_8 = 0x38, KEY_9 = 0x39, KEY_A = 0x41, KEY_B = 0x42,

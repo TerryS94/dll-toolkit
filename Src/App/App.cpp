@@ -111,7 +111,7 @@ void App::Shutdown()
 {
 	Reset_WndProc();
 
-	//for this to run, call Start_Eject() as soon as you flag your dll for eject
+	//for this to run, call SignalEject() as soon as you flag your dll for eject
 	if (IsEjecting())
 	{
 		UninstallPatches();
