@@ -61,6 +61,7 @@ namespace ProvidedDetours
 		if ((!appClassName.empty() && std::string_view(lpClassName) == appClassName) ||
 			(!appTitleName.empty() && std::string_view(lpWindowName) == appTitleName))
 		{
+			app.Update_HWND(windowHandle);
 			app.Override_WndProc();
 		}
 		return windowHandle;
