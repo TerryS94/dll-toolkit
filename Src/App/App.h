@@ -228,7 +228,7 @@ struct Hook
 class HookingLayer
 {
 private:
-	std::map<std::string_view, Hook> hooks;
+	std::unordered_map<std::string_view, Hook> hooks;
 	std::vector<Patch> patches;
 	bool hooks_applied = false;
 	bool patches_applied = false;
