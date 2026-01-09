@@ -232,9 +232,11 @@ private:
 	std::vector<Patch> patches;
 	bool hooks_applied = false;
 	bool patches_applied = false;
+
 public:
 	HookingLayer();
 	~HookingLayer();
+
 	//call the original function for a hook you installed by name
 	template<typename T> inline T GetOriginalFunction(const std::string_view& name)
 	{
@@ -246,28 +248,39 @@ public:
 		}
 		return (T)it->second.original;
 	}
+	
 	//Register hook data to be installed for when InstallHooks is called.
 	void RegisterHook(const std::string_view& name, uint64_t funcToHook, uint64_t detour);
+	
 	//Register patch data to be installed for when InstallPatches is called.
 	//If singleByteCount is greater than 0 and patchBytes is size 1 then it will write the single byte singleByteCount times.
 	//otherwise, if patchBytes is non-empty and if singleByteCount is 0 (Default), then its ignored and patchBytes will override the bytes that are currently at 'address'.
 	void RegisterPatch(uint64_t address, const std::vector<uint8_t>& patchBytes, size_t singleByteCount = 0u);
+	
 	//replace a function call (5 bytes) with another call
 	void ReplaceCall(uint64_t callAddress, uint64_t newFunction);
+	
 	//install any patches you registered with RegisterPatch/ReplaceCall
 	void InstallPatches();
+	
 	//uninstall all registered patches and replaced calls
 	void UninstallPatches();
+	
 	//install all registered hooks
 	void InstallHooks();
+	
 	//uninstall all registered hooks
 	void UninstallHooks();
+	
 	//returns a pointer to a location in memory using a pattern. Leave param 'module' empty to scan the current process by default.
 	[[nodiscard]] BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module = "");
+	
 	//in case you have something in another thread that needs to wait for this task to be done
 	[[nodiscard]] inline bool AreHooksInstalled() const { return hooks_applied; }
+	
 	//in case you have something in another thread that needs to wait for this task to be done
 	[[nodiscard]] inline bool ArePatchesInstalled() const { return patches_applied; }
+	
 	//check if a specific hook has been installed by name
 	[[nodiscard]] bool IsHookIntalled(const std::string_view& name) const;
 };
@@ -365,141 +378,153 @@ public:
 
     //initialize ImGui
 	void InitRenderer();
+	
 	//reload ImGui
 	void ReloadRenderer();
+	
 	//shut down ImGui (call before you FreeLibraryAndExitThread and everything else will be handled for you)
 	void Shutdown();
+	
 	//a wrapper for all new frame calls. also sets whether or not ImGui should render a mouse cursor by argument.
 	void BeginFrame(bool want_mouse_this_frame);
+	
 	//a wrapper for all ImGui_X_RenderDrawData calls and end frame calls.
 	void EndFrame() const;
+	
 	//reset WndProc back to default. handled by backend, but can be called manually if you need to in specific scenarios.
 	void Reset_WndProc() const;
+	
 	//high jack the target WndProc. handled by backend, but can be called manually if you need to in specific scenarios.
 	void Override_WndProc();
+	
 	//returns the original WndProc (For backend use. Can ignore this)
 	[[nodiscard]] inline WNDPROC Get_Original_WndProc() const { return original_WndProc; }
+	
 	//set this in dllmain just before jumping to your main thread!
 	inline void Set_DLLHandle(HMODULE mod) { dllHandle = mod; };
+	
 	//use this as first arg to FreeLibraryAndExitThread for ejecting (make sure to do Set_DLLHandle in dllmain!
 	[[nodiscard]] inline HMODULE Get_DLLHandle() const { return dllHandle; }
+	
 	//whether or not ImGui is initialized
 	[[nodiscard]] inline bool IsRendererActive() const { return isRendererActive; }
+	
 	//set whether or not ImGui should be considered active (BeginFrame/EndFrame shouldn't be reachable if this is false!)
 	inline void Set_RendererActive(bool active) { isRendererActive = active; }
+	
 	//has ImGui been initialized for the very first time
 	[[nodiscard]] inline bool HasInitializedFirstTime() const { return imguiFirstInitDone; }
+	
 	//notify that on the next frame we would like to reload ImGui
-	inline void Set_ImGui_Reload(bool need_reload)
-	{ 
-		if (need_reload) 
-		{ 
-#ifdef AnyOpenGLActive
-			//a brief explanation for the reloadTickCount assignment below:
-			
-			//This is because if you change resolution for example, you could get a dialog asking if you want to keep the new resolution but the opengl context is already changed,
-			//which makes the backend think its safe to reload imgui, but the user could be waiting on said dialog for however long and toolkit would think its safe to reload imgui
-			//because all it cares about is context change.
-			
-			//but the problem is, when you hit "yes" on that dialog, opengl then trashes some things that are not the context and toolkit is not aware of this, which ends up making our menu
-			//all black.. So basically this assumes if you change resolution and get a dialog like that, you would be hitting "yes" on the dialog within 5 seconds. Which is obviously a
-			//dirty trick and i need to find a way around this even if most users won't be sitting around on that dialog and will usually press "yes" within 5 seconds anyways.
-			
-			//Perhaps maybe i could flag when imgui needs to reload and then only actually reload it the next time the user wants to actually open the menu?
-			//That will come with edge cases too though..
+	void Set_ImGui_Reload(bool need_reload);
 
-			//set reloadTickCount to how many seconds to wait before actually reloading our imgui. Explanation above.^
-			reloadTickCount = GetTickCount64() + 5000ull;
-#endif
-			isMenuOpen = false;
-			wantFreeCursor = false;
-			hasMouseCursor = false;
-			Set_RendererActive(false); 
-		} 
-		needImGuiReload = need_reload; }
 	//check this every frame and when it's true, reload ImGui
-	[[nodiscard]] inline bool Need_ImGui_Reload() const
-	{
-#ifdef AnyOpenGLActive
-		return needImGuiReload && GetTickCount64() > reloadTickCount;
-#else
-		return needImGuiReload;
-#endif
-	}
+	[[nodiscard]] inline bool Need_ImGui_Reload() const;
+
 	//update the internal hwnd that App is aware of
 	inline void Update_HWND(HWND hwnd) { this->hwnd = hwnd; }
+	
 	//key press event only (use provided AppKeys enum or you can cast an integer to AppKeys for the same effect as "VK_X")
 	[[nodiscard]] bool IsKeyPressed(AppKeys key_code) const;
-    //checks if 'key1' is held while 'key2' is pressed only.
+    
+	//checks if 'key1' is held while 'key2' is pressed only.
     //if a 3rd key is passed in, then it checks if both 'key1' and 'key2' are held while 'key3' is pressed only.
 	[[nodiscard]] bool IsKeyChordPressed(AppKeys key1, AppKeys key2, AppKeys key3 = AppKeys::INVALID) const;
+	
 	//key down event only (use provided AppKeys enum or you can cast an integer to AppKeys for the same effect as "VK_X")
 	[[nodiscard]] bool IsKeyDown(AppKeys key_code) const;
+	
 	//is target window in focus
 	[[nodiscard]] inline bool IsTargetWindowFocused() const { return this->isTargetWindowFocused; };
+
 	//return the current hwnd that our App is aware of right now
 	[[nodiscard]] inline HWND GetHWND() const { return this->hwnd; };
+	
 	//a wrapper for ImGui_X_InvalidateDeviceObjects/ImGui_X_DestroyDeviceObjects
 	void ImGui_InvalidateDeviceObjects() const;
+	
 	//a wrapper for ImGui_X_CreateDeviceObjects
 	void ImGui_CreateDeviceObjects() const;
+	
 	//clean up any fonts or textures
 	void FreeResources();
+	
 	//on inject you can set this one time if you want to 'HIGH_PRIORITY_CLASS' for example
 	inline void Set_PriorityClass(DWORD dwPriorityClass) const { SetPriorityClass(GetCurrentProcess(), dwPriorityClass); };
+	
 	//a helper function that automatically checks if the HMODULE is valid first so we can avoid the "GetModuleHandle(x) could be 0" intellisense error.
 	[[nodiscard]] inline FARPROC Get_ProcAddress(const char* mod, const char* function) { HMODULE m = GetModuleHandle(mod); if (!m) return nullptr; return GetProcAddress(m, function); }
+	
 	//are we in the process of unloading our dll?
 	[[nodiscard]] inline bool IsEjecting() const { return isEjectingDLL; }
+	
 	//make this the first thing you call when you flag your dll to eject so that certain sections unload properly in Shutdown
 	//because Shutdown is also called for reloading ImGui
 	inline void SignalEject() { this->Set_RendererActive(false); isEjectingDLL = true; }
+	
 	//toggle your main tool overlay on/off
 	inline void ToggleMenu(bool open) { isMenuOpen = open; if (!isMenuOpen) wantFreeCursor = false; }
+	
 	//is our tool overlay open/visible?
 	[[nodiscard]] inline bool IsMenuOpen() const { return isMenuOpen; }
+	
 	//make App aware of the target window titlename and classname you're workin with
 	inline void Set_TargetWindowInfo(const std::string_view& title_name, const std::string_view& class_name) { this->targetWindowTitleName = title_name; this->targetWindowClassName = class_name; }
+	
 	//get the current target window classname the user specified on inject with Set_targetWindowInfo
 	[[nodiscard]] inline const std::string_view& Get_TargetWindowClassName() const { return targetWindowClassName; }
+	
 	//get the current target window title name the user specified on inject with Set_targetWindowInfo
 	[[nodiscard]] inline const std::string_view& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
+	
 	//Automatically create hooks for CreateWindowExA, NtUserDestroyWindow, GetCursorPos, NtUserSetCursorPos and DeviceIoControl; maybe more will be added in the future.
 	//These can be used for any backend, hence "Universal". Doesn't include WndProc because that's already handled in the Init etc.
 	//Note: this will not install the hooks. Only registers them. you will need to do app.InstallHooks() after registering these and the rest of your hooks, if any!
 	//Recommended: call this function one time on inject before your app.InstallHooks() call or else when you open your menu, the mouse will act weird and these hooks take care of that.
 	void RegisterUniversalHooks();
+	
 	//registers all backend specific hooks for you. Example: EndScene, Present, Reset etc for DirectX9
 	//or if you're building for OpenGL then itll register SwapBuffers etc for you.
 	//just simply call this function before you invoke InstallHooks()
 	void RegisterBackEndHooks();
+	
 	//do we have a mouse cursor given to us by ImGui?
 	[[nodiscard]] bool HasMouseCursor() const { return hasMouseCursor; }
+	
 	//if you need a mouse cursor without having to open the main menu (for just wanting to move HUD around for example)
 	inline void ToggleFreeMouseCursor(bool give) { this->wantFreeCursor = give; }
+	
 	//do we currently have a free cursor? (a cursor given to us without the need of the main menu being open)
 	[[nodiscard]] inline bool IsFreeMouseCursorActive() const { return wantFreeCursor; }
+	
 	//set your InitResources function pointer here so that way the hooking side of things is handled automatically.
 	inline void Set_InitResourcesFunc(std::function<void()> initResources) { userInitResources = std::move(initResources); };
+	
 	//set your "OnRender" function pointer here so that way it can be called in the appropriate hook automatically.
 	inline void Set_UserRenderFunc(std::function<void()> MainRender) { userRenderFunc = std::move(MainRender); };
+	
 	//For hooks etc to call automatically. You can ignore this.
 	//Will call the user's InitResources function which App is made aware of by the user defining it on inject with the Set_InitResourcesFunc function
 	inline void Call_UserInitResources() { if (userInitResources) userInitResources(); };
+	
 	//Will call the user's "OnRender" function which App is made aware of by the user defining it on inject with the Set_UserRenderFunction function
 	inline void Call_UserRenderFunction() { if (userRenderFunc) userRenderFunc(); };
 
 	//register a font from memory
 	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
+	
 	//register a font from a file
 	void AddFontFromFile(const std::string_view& fontName, const std::string_view& path, float initialFontSize);
+	
 	//get a pointer to any font by name that was registered via AddFontFromMemory/AddFontFromFile
 	[[nodiscard]] ImFont* GetFontByName(const std::string_view& fontName);
 
 	//a wrapper that loads a texture from a file regardless of the desired provided backend renderer
 	void AddTextureFromFile(const std::string_view& name, const std::string_view& path);
+	
 	//a wrapper that loads a texture from memory regardless of the desired provided backend renderer
 	void AddTextureFromMemory(const std::string_view& name, void* data, const size_t data_size);
+	
 	//get a pointer to any texture by name that was loaded via AddTextureFromMemory/AddTextureFromFile
 	[[nodiscard]] CustomTexture* GetTextureByName(const std::string_view& textureName);
 
@@ -509,10 +534,12 @@ private:
 	void** dxSwapChainVTable = nullptr;
 	void UpdateDirectXDeviceVTable();
 	void UpdateDirectXSwapChainVTable();
+
 public:
 	//you can use directly if you want but check out the macros if you don't know which indexes to use.
 	//Example, DX9_EndScene_Addr already gives you GetDirectXSwapChainMethodByIndex(42).
 	[[nodiscard]] void* GetDirectXDeviceMethodByIndex(int index) const;
+	
 	//you can use directly if you want but check out the macros if you don't know which indexes to use.
 	//Example, DX9_Present_Addr already gives you GetDirectXSwapChainMethodByIndex(3).
 	[[nodiscard]] void* GetDirectXSwapChainMethodByIndex(int index) const;
@@ -523,18 +550,23 @@ public: //public because its easier to use some of this stuff in hooks
 	//[Internal] don't use unless you know what you're doing!
 	//Prefer using UpdateDirectXDevice to make App aware of the current Device because it handles the reference count for you as well as updating the vtable.
 	IDirect3DDevice9* dxDevice = nullptr;
+	
 	//use this function to update the device pointer, it will also update swap chain and all vtables.
 	void UpdateDirectXDevice(IDirect3DDevice9* device);
 #elifdef DirectX10
 private:
 	void UpdateDirectXDevice();
+
 public:
 	//[Internal] don't use unless you know what you're doing!
 	ID3D10Device* dxDevice = nullptr;
+	
 	//[Internal] don't use! Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
+	
 	//[Internal] don't use. It's handled automatically for you already.
 	ID3D10RenderTargetView* dxMainRenderTargetView = nullptr;
+	
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you,
 	//as well as automatically derive the Device pointer and will update the Device vtable too.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
@@ -547,23 +579,30 @@ private:
 public:
 	//[Internal] don't use unless you know what you're doing!
 	ID3D11Device* dxDevice = nullptr;
+	
 	//[Internal] don't use. Prefer using UpdateDirectXSwapChain to make App aware of the current swapchain because it handles the reference count for you as well as updating the vtable.
 	IDXGISwapChain* dxSwapChain = nullptr;
+	
 	//[Internal] don't use unless you know what you're doing!
 	ID3D11DeviceContext* dxContext = nullptr;
+	
 	//[Internal] don't use. It's handled automatically for you already.
 	ID3D11RenderTargetView* dxMainRenderTargetView = nullptr;
+	
 	//unused at the moment.
 	[[nodiscard]] void* GetDirectXContextMethodByIndex(int index) const;
+	
 	//assign swapChain via this function and not dxSwapChain directly! This will handle refcount and update the vtable for you,
 	//as well as automatically derive the Device and Context pointers and will update those vtables too.
 	void UpdateDirectXSwapChain(IDXGISwapChain* swapChain);
 #elifdef OpenGL3
 private:
 	const char* glsl_version = nullptr;
+
 public:
 	//after inject, initialize this once time somewhere. example string would be "#version 330 core"
 	inline void SetGLSLVersion(const char* version) { glsl_version = version; }
+	
 	//returns a string of the known GLSL version that was provided by the user
 	[[nodiscard]] inline const char* GetGLSLVersion() { return glsl_version; }
 #endif

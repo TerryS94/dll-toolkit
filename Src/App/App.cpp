@@ -285,6 +285,45 @@ void App::FreeFonts()
 	fonts.clear();
 }
 
+void App::Set_ImGui_Reload(bool need_reload)
+{
+	if (need_reload)
+	{
+#ifdef AnyOpenGLActive
+		//a brief explanation for the reloadTickCount assignment below:
+
+		//This is because if you change resolution for example, you could get a dialog asking if you want to keep the new resolution but the opengl context is already changed,
+		//which makes the backend think its safe to reload imgui, but the user could be waiting on said dialog for however long and toolkit would think its safe to reload imgui
+		//because all it cares about is context change.
+
+		//but the problem is, when you hit "yes" on that dialog, opengl then trashes some things that are not the context and toolkit is not aware of this, which ends up making our menu
+		//all black.. So basically this assumes if you change resolution and get a dialog like that, you would be hitting "yes" on the dialog within 5 seconds. Which is obviously a
+		//dirty trick and i need to find a way around this even if most users won't be sitting around on that dialog and will usually press "yes" within 5 seconds anyways.
+
+		//Perhaps maybe i could flag when imgui needs to reload and then only actually reload it the next time the user wants to actually open the menu?
+		//That will come with edge cases too though..
+
+		//set reloadTickCount to how many seconds to wait before actually reloading our imgui. Explanation above.^
+		reloadTickCount = GetTickCount64() + 5000ull;
+#endif
+		isMenuOpen = false;
+		wantFreeCursor = false;
+		hasMouseCursor = false;
+		Set_RendererActive(false);
+	}
+	needImGuiReload = need_reload;
+}
+
+//check this every frame and when it's true, reload ImGui
+bool App::Need_ImGui_Reload() const
+{
+#ifdef AnyOpenGLActive
+	return needImGuiReload && GetTickCount64() > reloadTickCount;
+#else
+	return needImGuiReload;
+#endif
+}
+
 //checks if 'key1' is held while 'key2' is pressed only.
 //if a 3rd key is passed in, then it checks if both 'key1' and 'key2' are held while 'key3' is pressed only.
 bool App::IsKeyChordPressed(AppKeys key1, AppKeys key2, AppKeys key3) const
