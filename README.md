@@ -146,16 +146,20 @@ DWORD WINAPI MainThread([[maybe_unused]] LPVOID lpParameter)
 		app.Set_UserRenderFunc(MainRender);
 
 #ifdef DirectX9
-        app.Set_TargetWindowInfo("Call of Duty 4 X", "CoD4");//example for the game 'Call of Duty 4'
+		//make App class aware of the window we want to work with
+        app.Set_TargetWindowInfo("Call of Duty 4 X");//example for the game 'Call of Duty 4'
         app.UpdateDirectXDevice(GetGameDevicePtr()); 
 #elif defined DirectX10 || defined DirectX11
-		app.Set_TargetWindowInfo("game window title", "game window class name");
+		//make App class aware of the window we want to work with
+		app.Set_TargetWindowInfo("game window title");
 		//dx device and context are derived from the swapchain
         app.UpdateDirectXSwapChain(*reinterpret_cast<IDXGISwapChain**>(0x35E5F94));//the games swapchain address
 #elifdef OpenGL2
-		app.Set_TargetWindowInfo("game window title", "game window class name");
+		//make App class aware of the window we want to work with
+		app.Set_TargetWindowInfo("game window title");
 #elifdef OpenGL3
-        app.Set_TargetWindowInfo("MX Bikes", "Core Window Class");//example for the game 'MX Bikes'
+		//make App class aware of the window we want to work with
+        app.Set_TargetWindowInfo("MX Bikes");//example for the game 'MX Bikes'
         app.SetGLSLVersion("#version 330 core");
 #endif
 		//registers backend specific hooks (EndScene for DirectX9 and so on...)
