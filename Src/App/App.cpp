@@ -360,7 +360,16 @@ void App::Update_IsTargetWindowFocused()
 	this->isTargetWindowFocused = fgWin && target && fgWin == target;
 }
 
-void App::AddFontFromFile(const std::string_view& fontName, const std::string_view& path, float initialFontSize)
+std::string App::GetClassByWindowTitle(const std::string& exact_window_title) const
+{
+	HWND hwnd = FindWindowA(nullptr, exact_window_title.c_str());
+	if (!hwnd) return {};
+	char className[256] = {};
+	if (GetClassNameA(hwnd, className, sizeof(className)) == 0) return {};
+	return std::string(className);
+}
+
+void App::AddFontFromFile(const std::string& fontName, const std::string& path, float initialFontSize)
 {
 	assert(imguiFirstInitDone && "Must be called after InitRenderer!");
 	if (fonts.contains(fontName))
@@ -386,7 +395,7 @@ void App::AddFontFromFile(const std::string_view& fontName, const std::string_vi
 	fonts[fontName] = font;
 }
 
-void App::AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize)
+void App::AddFontFromMemory(const std::string& fontName, const void* fontData, int data_size, float initialFontSize)
 {
 	assert(imguiFirstInitDone && "Must be called after InitRenderer!");
 	if (fonts.contains(fontName))
@@ -402,7 +411,7 @@ void App::AddFontFromMemory(const std::string_view& fontName, const void* fontDa
 	fonts[fontName] = io.Fonts->AddFontFromMemoryCompressedTTF(fontData, data_size, initialFontSize, &fontConfig);
 }
 
-ImFont* App::GetFontByName(const std::string_view& fontName)
+ImFont* App::GetFontByName(const std::string& fontName)
 {
 	auto it = fonts.find(fontName);
 	if (it != fonts.end())
@@ -410,13 +419,13 @@ ImFont* App::GetFontByName(const std::string_view& fontName)
 	return nullptr;
 }
 
-CustomTexture* App::GetTextureByName(const std::string_view& textureName)
+CustomTexture* App::GetTextureByName(const std::string& textureName)
 {
 	auto it = textures.find(textureName);
 	return it == textures.end() ? nullptr : it->second.get();
 }
 
-void App::AddTextureFromFile(const std::string_view& name, const std::string_view& path)
+void App::AddTextureFromFile(const std::string& name, const std::string& path)
 {
 	assert(imguiFirstInitDone && "Must be called after InitRenderer!");
 	if (!std::filesystem::exists(path)) { MessageBox(nullptr, std::format("\"{}\" doesn't exist!", path).c_str(), "F", MB_OK); return; }
@@ -441,7 +450,7 @@ void App::AddTextureFromFile(const std::string_view& name, const std::string_vie
 	textures[name] = std::move(tex);
 }
 
-void App::AddTextureFromMemory(const std::string_view& name, void* data, const size_t data_size)
+void App::AddTextureFromMemory(const std::string& name, void* data, const size_t data_size)
 {
 	assert(imguiFirstInitDone && "Must be called after InitRenderer!");
 	if (!data || data_size == 0)
@@ -998,7 +1007,7 @@ void HookingLayer::UninstallHooks()
 	hooks_applied = false;
 }
 
-bool HookingLayer::IsHookIntalled(const std::string_view& name) const
+bool HookingLayer::IsHookIntalled(const std::string& name) const
 {
 	return hooks.contains(name);
 }
@@ -1069,7 +1078,7 @@ void HookingLayer::InstallPatches()
 	patches_applied = true;
 }
 
-void HookingLayer::RegisterHook(const std::string_view& name, uint64_t funcToHook, uint64_t detour)
+void HookingLayer::RegisterHook(const std::string& name, uint64_t funcToHook, uint64_t detour)
 {
 	if (hooks.contains(name))
 	{
@@ -1106,7 +1115,7 @@ void HookingLayer::UninstallPatches()
 	patches_applied = false;
 }
 
-static std::vector<int> ParsePattern(const std::string_view& pattern)
+static std::vector<int> ParsePattern(const std::string& pattern)
 {
 	std::vector<int> bytes;
 	std::string token;
@@ -1136,7 +1145,7 @@ static std::vector<int> ParsePattern(const std::string_view& pattern)
 	}
 	return bytes;
 }
-BYTE* HookingLayer::FindPattern(const std::string_view& pattern, const std::string_view& module)
+BYTE* HookingLayer::FindPattern(const std::string& pattern, const std::string& module)
 {
 	HMODULE modHandle = module.empty() ? GetModuleHandleA(nullptr) : GetModuleHandleA(module.data());
 	if (!modHandle) return nullptr;

@@ -228,7 +228,7 @@ struct Hook
 class HookingLayer
 {
 private:
-	std::unordered_map<std::string_view, Hook> hooks;
+	std::unordered_map<std::string, Hook> hooks;
 	std::vector<Patch> patches;
 	bool hooks_applied = false;
 	bool patches_applied = false;
@@ -238,7 +238,7 @@ public:
 	~HookingLayer();
 
 	//call the original function for a hook you installed by name
-	template<typename T> inline T GetOriginalFunction(const std::string_view& name)
+	template<typename T> inline T GetOriginalFunction(const std::string& name)
 	{
 		auto it = hooks.find(name);
 		if (it == hooks.end())
@@ -250,7 +250,7 @@ public:
 	}
 	
 	//Register hook data to be installed for when InstallHooks is called.
-	void RegisterHook(const std::string_view& name, uint64_t funcToHook, uint64_t detour);
+	void RegisterHook(const std::string& name, uint64_t funcToHook, uint64_t detour);
 	
 	//Register patch data to be installed for when InstallPatches is called.
 	//If singleByteCount is greater than 0 and patchBytes is size 1 then it will write the single byte singleByteCount times.
@@ -273,7 +273,7 @@ public:
 	void UninstallHooks();
 	
 	//returns a pointer to a location in memory using a pattern. Leave param 'module' empty to scan the current process by default.
-	[[nodiscard]] BYTE* FindPattern(const std::string_view& pattern, const std::string_view& module = "");
+	[[nodiscard]] BYTE* FindPattern(const std::string& pattern, const std::string& module = "");
 	
 	//in case you have something in another thread that needs to wait for this task to be done
 	[[nodiscard]] inline bool AreHooksInstalled() const { return hooks_applied; }
@@ -282,7 +282,7 @@ public:
 	[[nodiscard]] inline bool ArePatchesInstalled() const { return patches_applied; }
 	
 	//check if a specific hook has been installed by name
-	[[nodiscard]] bool IsHookIntalled(const std::string_view& name) const;
+	[[nodiscard]] bool IsHookIntalled(const std::string& name) const;
 };
 
 struct MouseStateSnapshot
@@ -328,11 +328,11 @@ private:
 	bool isTargetWindowFocused = false;
 	HWND hwnd = nullptr;
 	WNDPROC original_WndProc = nullptr;
-	std::unordered_map<std::string_view, ImFont*> fonts;
-	std::unordered_map<std::string_view, std::unique_ptr<CustomTexture>> textures;
+	std::unordered_map<std::string, ImFont*> fonts;
+	std::unordered_map<std::string, std::unique_ptr<CustomTexture>> textures;
 	HMODULE dllHandle = 0;
-	std::string_view targetWindowClassName;
-	std::string_view targetWindowTitleName;
+	std::string targetWindowClassName;
+	std::string targetWindowTitleName;
 	bool hasMouseCursor = false;
 	bool wantFreeCursor = false;
 	std::function<void()> userInitResources;
@@ -367,6 +367,7 @@ private:
 	void FreeTextures();
 	void FreeFonts();
 	void Update_IsTargetWindowFocused();
+	std::string GetClassByWindowTitle(const std::string& exact_window_title) const;
 
 public:
 	App();
@@ -419,7 +420,7 @@ public:
 	void Set_ImGui_Reload(bool need_reload);
 
 	//check this every frame and when it's true, reload ImGui
-	[[nodiscard]] inline bool Need_ImGui_Reload() const;
+	[[nodiscard]] bool Need_ImGui_Reload() const;
 
 	//update the internal hwnd that App is aware of
 	inline void Update_HWND(HWND hwnd) { this->hwnd = hwnd; }
@@ -468,14 +469,14 @@ public:
 	//is our tool overlay open/visible?
 	[[nodiscard]] inline bool IsMenuOpen() const { return isMenuOpen; }
 	
-	//make App aware of the target window titlename and classname you're workin with
-	inline void Set_TargetWindowInfo(const std::string_view& title_name, const std::string_view& class_name) { this->targetWindowTitleName = title_name; this->targetWindowClassName = class_name; }
+	//make App aware of the target window you're workin with for CreateWindowExA hook purposes
+	inline void Set_TargetWindowInfo(const std::string& exact_window_title) { this->targetWindowTitleName = exact_window_title; this->targetWindowClassName = GetClassByWindowTitle(exact_window_title); }
 	
 	//get the current target window classname the user specified on inject with Set_targetWindowInfo
-	[[nodiscard]] inline const std::string_view& Get_TargetWindowClassName() const { return targetWindowClassName; }
+	[[nodiscard]] inline const std::string& Get_TargetWindowClassName() const { return targetWindowClassName; }
 	
 	//get the current target window title name the user specified on inject with Set_targetWindowInfo
-	[[nodiscard]] inline const std::string_view& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
+	[[nodiscard]] inline const std::string& Get_TargetWindowTitleName() const { return targetWindowTitleName; }
 	
 	//Automatically create hooks for CreateWindowExA, NtUserDestroyWindow, GetCursorPos, NtUserSetCursorPos and DeviceIoControl; maybe more will be added in the future.
 	//These can be used for any backend, hence "Universal". Doesn't include WndProc because that's already handled in the Init etc.
@@ -511,22 +512,22 @@ public:
 	inline void Call_UserRenderFunction() { if (userRenderFunc) userRenderFunc(); };
 
 	//register a font from memory
-	void AddFontFromMemory(const std::string_view& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
+	void AddFontFromMemory(const std::string& fontName, const void* fontData, int data_size, float initialFontSize = 13.0f);
 	
 	//register a font from a file
-	void AddFontFromFile(const std::string_view& fontName, const std::string_view& path, float initialFontSize);
+	void AddFontFromFile(const std::string& fontName, const std::string& path, float initialFontSize);
 	
 	//get a pointer to any font by name that was registered via AddFontFromMemory/AddFontFromFile
-	[[nodiscard]] ImFont* GetFontByName(const std::string_view& fontName);
+	[[nodiscard]] ImFont* GetFontByName(const std::string& fontName);
 
 	//a wrapper that loads a texture from a file regardless of the desired provided backend renderer
-	void AddTextureFromFile(const std::string_view& name, const std::string_view& path);
+	void AddTextureFromFile(const std::string& name, const std::string& path);
 	
 	//a wrapper that loads a texture from memory regardless of the desired provided backend renderer
-	void AddTextureFromMemory(const std::string_view& name, void* data, const size_t data_size);
+	void AddTextureFromMemory(const std::string& name, void* data, const size_t data_size);
 	
 	//get a pointer to any texture by name that was loaded via AddTextureFromMemory/AddTextureFromFile
-	[[nodiscard]] CustomTexture* GetTextureByName(const std::string_view& textureName);
+	[[nodiscard]] CustomTexture* GetTextureByName(const std::string& textureName);
 
 #ifdef AnyDirectXActive
 private:
