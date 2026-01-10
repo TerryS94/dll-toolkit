@@ -367,7 +367,7 @@ private:
 	void FreeTextures();
 	void FreeFonts();
 	void Update_IsTargetWindowFocused();
-	std::string GetClassByWindowTitle(const std::string& exact_window_title) const;
+	std::string GetClassByWindowTitle(const std::string& partial_window_title) const;
 
 public:
 	App();
@@ -469,8 +469,9 @@ public:
 	//is our tool overlay open/visible?
 	[[nodiscard]] inline bool IsMenuOpen() const { return isMenuOpen; }
 	
-	//make App aware of the target window you're workin with for CreateWindowExA hook purposes
-	inline void Set_TargetWindowInfo(const std::string& exact_window_title) { this->targetWindowTitleName = exact_window_title; this->targetWindowClassName = GetClassByWindowTitle(exact_window_title); }
+	//make App aware of the target window you're workin with for CreateWindowExA hook purposes.
+	//case-insensitive and doesn't have to be exact match (some games can have dynamic parts to their title names)
+	inline void Set_TargetWindowInfo(const std::string& partial_window_title) { this->targetWindowTitleName = partial_window_title; this->targetWindowClassName = GetClassByWindowTitle(partial_window_title); }
 	
 	//get the current target window classname the user specified on inject with Set_targetWindowInfo
 	[[nodiscard]] inline const std::string& Get_TargetWindowClassName() const { return targetWindowClassName; }

@@ -360,13 +360,23 @@ void App::Update_IsTargetWindowFocused()
 	this->isTargetWindowFocused = fgWin && target && fgWin == target;
 }
 
-std::string App::GetClassByWindowTitle(const std::string& exact_window_title) const
+std::string App::GetClassByWindowTitle(const std::string& partial_window_title) const
 {
-	HWND hwnd = FindWindowA(nullptr, exact_window_title.c_str());
-	if (!hwnd) return {};
-	char className[256] = {};
-	if (GetClassNameA(hwnd, className, sizeof(className)) == 0) return {};
-	return std::string(className);
+	std::string needle = partial_window_title;
+	for (auto& c : needle) c = (char)std::tolower((unsigned char)c);
+	struct Data { const std::string* n; std::string out; } data { &needle, {} };
+	EnumWindows([](HWND hwnd, LPARAM p) -> BOOL
+	{
+		auto* d = reinterpret_cast<Data*>(p);
+		char title[256] = {};
+		if (GetWindowTextA(hwnd, title, sizeof(title)) <= 0) return TRUE;
+		for (char* s = title; *s; ++s) *s = (char)std::tolower((unsigned char)*s);
+		if (!std::strstr(title, d->n->c_str())) return TRUE;
+		char cls[256] = {};
+		if (GetClassNameA(hwnd, cls, sizeof(cls)) > 0) d->out = cls;
+		return FALSE;
+	}, reinterpret_cast<LPARAM>(&data));
+	return data.out;
 }
 
 void App::AddFontFromFile(const std::string& fontName, const std::string& path, float initialFontSize)
