@@ -56,10 +56,15 @@ namespace ProvidedDetours
 	HWND WINAPI CreateWindowExA_Detour(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 	{
 		HWND windowHandle = app.GetOriginalFunction<tCreateWindowExA>("CreateWindowExA")(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-		const std::string_view& appClassName = app.Get_TargetWindowClassName();
-		const std::string_view& appTitleName = app.Get_TargetWindowTitleName();
-		if ((!appClassName.empty() && std::string_view(lpClassName) == appClassName) ||
-			(!appTitleName.empty() && std::string_view(lpWindowName) == appTitleName))
+		
+		static auto to_lower = [](const std::string& input) { std::string out = input; std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); }); return out; };
+		const char* className = lpClassName ? lpClassName : "";//lpclassName can be null so check for that before running to_lower on it
+		const char* windowName = lpWindowName ? lpWindowName : "";//lpWindowName can be null so check for that before running to_lower on it
+		const std::string classLower = to_lower(className);
+		const std::string titleLower = to_lower(windowName);
+		const std::string appClassName = to_lower(app.Get_TargetWindowClassName());
+		const std::string appTitleName = to_lower(app.Get_TargetWindowTitleName());
+		if ((!appClassName.empty() && classLower.find(appClassName) != std::string::npos) || (!appTitleName.empty() && titleLower.find(appTitleName) != std::string::npos))
 		{
 			app.Update_HWND(windowHandle);
 			app.Override_WndProc();
