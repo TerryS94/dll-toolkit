@@ -95,6 +95,8 @@
 #include "backends/imgui_impl_win32.h"
 #include "misc/cpp/imgui_stdlib.h"
 
+#include "Utils/Utils.h"
+
 #if defined DirectX9
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -317,7 +319,39 @@ public:
 	MouseStateSnapshot& operator=(const MouseStateSnapshot&) = delete;
 };
 
-class App : public HookingLayer, public MouseStateSnapshot
+enum class ELogType : uint8_t
+{
+	SUCCESS,
+	WARNING,
+	FAILURE,
+};
+struct Log
+{
+	ELogType type = ELogType::SUCCESS;
+	std::string message = "";
+	inline Log(ELogType type, std::string message) : type(type), message(message) {}
+	inline Log() {}
+	inline ~Log() {}
+};
+class Logger
+{
+private:
+	std::vector<Log> logs;
+
+public:
+	inline Logger() {}
+	inline ~Logger() { logs.clear(); }
+	[[nodiscard]] inline const std::vector<Log>& GetLogHistory() const { return logs; }
+	template <typename ...Args> inline void AddLog(ELogType type, const char* message, Args... args)
+	{
+		//if (app.IsEjecting()) return;
+		char buffer[4096] = { 0 };
+		sprintf_s(buffer, message, args...);
+		logs.emplace_back(type, std::format("[{}]: {}", Utils::GetTimeNow(), std::string(buffer)));
+	}
+};
+
+class App : public HookingLayer, public MouseStateSnapshot, public Logger
 {
 private:
 	bool isMenuOpen = false;
