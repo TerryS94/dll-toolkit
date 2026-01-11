@@ -131,24 +131,19 @@ namespace Utils
 	bool CopyToClipboard(const std::string_view& text)
 	{
 		bool succeeded = false;
-
 		if (HANDLE clipdata = GlobalAlloc(GMEM_MOVEABLE, text.length() + 1))
 		{
 			if (auto clipdataptr = GlobalLock(clipdata))
 			{
 				std::memcpy(clipdataptr, text.data(), text.length() + 1);
 				GlobalUnlock(clipdata);
-
 				if (OpenClipboard(nullptr))
 				{
-					if (EmptyClipboard() && SetClipboardData(CF_TEXT, clipdata))
-						succeeded = true;
-
+					if (EmptyClipboard() && SetClipboardData(CF_TEXT, clipdata)) succeeded = true;
 					CloseClipboard();
 				}
 			}
-			if (!succeeded)
-				GlobalFree(clipdata);
+			if (!succeeded) GlobalFree(clipdata);
 		}
 		return succeeded;
 	}
@@ -188,14 +183,14 @@ namespace Utils
 		if (result > 0) return std::string(buffer);
 		return "";
 	}
-	std::string GetActiveWindowTitle()
+	std::string GetActiveWindowTitleName()
 	{
 		char wnd_title[256];
 		HWND hwnd = GetForegroundWindow();
 		GetWindowText(hwnd, wnd_title, sizeof(wnd_title));
 		return wnd_title;
 	}
-	std::string FileBinaryToString(const std::string& path)
+	std::string FileBinary_ToString(const std::string& path)
 	{
 		std::ifstream in(path, std::ios::binary | std::ios::ate);
 		if (!in) return {};

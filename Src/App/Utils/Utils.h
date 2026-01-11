@@ -35,8 +35,8 @@ namespace Utils
 	std::string GetMillisecondsSinceEpochNow_ToString();
 	std::string GetTimeNow();
 	std::string GetDateNow();
-	std::string GetActiveWindowTitle();
-	std::string FileBinaryToString(const std::string& path);
+	std::string GetActiveWindowTitleName();
+	std::string FileBinary_ToString(const std::string& path);
 	int64_t GetFileTimestamp(const std::filesystem::path& path);
 	std::string GetFileLastModifiedDate(const std::string& path);
 	std::string GetDateTimeStringFromEpochMs(int64_t epochMs);
